@@ -1,0 +1,33 @@
+{
+  "name": "ladyshadow_v4",
+  "version": "4.0.0",
+  "description": "LadyShadow is a basic Discord Moderation bot with other logging features.\\nShadow includes other \"fun\" commands, as well as being the central hub for a Server to Server \"Rift\" and the main place for the \"Shadow RPG\".",
+  "main": "shard.js",
+  "directories": {
+    "doc": "docs"
+  },
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/ScionSpy/LadyShadow_v4.git"
+  },
+  "keywords": [
+    "Lady",
+    "Shadow",
+    "SRPG",
+    "RPG",
+    "Shadow",
+    "RPG"
+  ],
+  "author": "Shadow_Spy#1904 && Bejebajay#1904",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/ScionSpy/LadyShadow_v4/issues"
+  },
+  "homepage": "https://github.com/ScionSpy/LadyShadow_v4#readme",
+  "dependencies": {
+    "discord.js": "^12.5.1"
+  }
+}
