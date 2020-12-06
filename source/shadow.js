@@ -11,7 +11,6 @@ let readyTimer = Date.now();
 const system = require("./_dir");
 const DataBase = require("../DataBase/main")
 const discord = require("discord.js");
-const { start } = require("repl");
 const bot = new discord.Client({ ws: { intents: 515 } });
 
 var trimer = async function(array){

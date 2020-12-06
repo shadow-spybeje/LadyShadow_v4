@@ -1,8 +1,3 @@
-const { SSL_OP_DONT_INSERT_EMPTY_FRAGMENTS } = require('constants');
-
-const DB_URL = "mongodb://localhost:27017/";
-const DB_Defualt = "LilithShadow";
-
 const DataBase = {
     defualt: null
 
@@ -24,7 +19,7 @@ module.exports = {
         if(!DataBase.defualt) return console.log("Cannot open Database. Database not defined.");
 
         let MongoClient = require('mongodb').MongoClient;
-        MongoClient = new MongoClient(DB_URL, {useUnifiedTopology:true});
+        MongoClient = new MongoClient("mongodb://localhost:27017/", {useUnifiedTopology:true});
         return MongoClient;
     },
 
