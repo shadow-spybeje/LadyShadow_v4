@@ -28,7 +28,7 @@ module.exports = {
             status: "idle",
             activity: {
                 type: "STREAMING",
-                name: `in Dev Mode. | ${bot.config.settings.prefix}help`,
+                name: `the Beta Version. | ${bot.config.settings.prefix}help`,
                 url: "https://www.twitch.tv/scion_spy"
             }
         });
