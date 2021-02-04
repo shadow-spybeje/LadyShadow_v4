@@ -5,7 +5,7 @@
  *
 */
 
-const token = require('../.././tokens.json').LadyShadow;
+const token = require('../.././tokens.json').Beta;//LadyShadow;
 const { ShardingManager } = require('discord.js');
 
 const shard = new ShardingManager('./source/shadow.js', { token: token,
