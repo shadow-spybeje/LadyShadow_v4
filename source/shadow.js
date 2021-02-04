@@ -55,7 +55,8 @@ bot.startUp = async function(bot){
     let time = Date.now();
     await system.collections(bot, discord);
 
-    await bot.db.init(["ScionSpy", "SpyaBeje1904_Syber-MongoDB"], {database: "LilithShadow"})
+    const db = require('../../.././tokens.json').db;
+    await bot.db.init([db.username, db.password], {database: "LilithShadow"})
     .then(op => bot.print(`Initialized the database with the options:\n>> ${JSON.stringify(op)}`, 0, 0, 1))
     .catch(err => { return bot.print(err, 0, 1, 1) });
 
