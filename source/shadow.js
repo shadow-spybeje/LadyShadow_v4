@@ -32,7 +32,7 @@ bot.print = function(msg, debugOnly, error, preReady){
     let post = "";
 
     if(debugOnly){
-        if(!bot.config.debug) return;
+        if(!bot.config.settings.debug) return;
         post = `>> [${bot.functions.get("date").execute(Date.now())}] -> (Debug) ${msg}`
     }else{
         post = `>  [${bot.functions.get("date").execute(Date.now())}] -> ${msg}`
@@ -57,7 +57,7 @@ bot.startUp = async function(bot){
 
     const db = require('../../.././tokens.json').db;
     await bot.db.init([db.username, db.password], {database: "LilithShadow"})
-    .then(op => bot.print(`Initialized the database with the options:\n>> ${JSON.stringify(op)}`, 0, 0, 1))
+    .then(op => bot.print(`Initialized the database with the options: ${JSON.stringify(op)}`, 0, 0, 1))
     .catch(err => { return bot.print(err, 0, 1, 1) });
 
     let sus = false; //is only True if db fails to load.
@@ -103,9 +103,8 @@ bot.startUp = async function(bot){
     });
 
     time = Date.now() - time;
-    bot.print(bot.config,1);
 
-    bot.print(`> Database retrieval finished. (Took ${time}.ms)`, 0, 0, 1);
+    bot.print(`Database retrieval finished. (Took ${time}.ms)`, 0, 0, 1);
     bot.startUp.DataBase_Retrieval = time+".ms";
 };
 
