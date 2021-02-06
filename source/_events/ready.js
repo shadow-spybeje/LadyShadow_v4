@@ -65,7 +65,7 @@ module.exports = {
         ];
         conf = await bot.functions.get("bufferSpace").execute(conf);
         //#endregion
-        bot.print(`Client Configuration:\n${c}`);
+        bot.print(`Client Configuration:\n${c}`, 1);
         bot.print(`Client Ready\n>>\ \ \ \ ${conf.join("\n>>\ \ \ \ ")}`);
 
         bot.functions.get("_").init({ bot:bot });
