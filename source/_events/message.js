@@ -7,6 +7,12 @@ module.exports = {
 
     async execute(bot, message){
         if(message.author.bot) return;
+
+        //Shadow Community, Gamer's Fan Server
+        if(message.guild.id == "416906584900239370" || message.guild.id == "787576597233532928" && message.content.startsWith(bot.phasmo.options.prefix)){
+            bot.phasmo.msg(bot, {channel:message.channel, msg:message.content});
+        };
+
         const args = message.content.slice(bot.config.settings.prefix.length).trim().split(/ +/g);
         const cmd = args.shift();
 

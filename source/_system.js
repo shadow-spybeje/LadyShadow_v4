@@ -33,6 +33,12 @@ module.exports = {
 
     //#endregion
 
+    //#region Other
+
+      bot.phasmo = require("./other/phasmo");
+
+    //#endregion
+
         return bot;
     },
 
