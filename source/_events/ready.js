@@ -36,6 +36,7 @@ module.exports = {
 
         readyTimer = Date.now() - bot.readyTimer;
         bot.readyTime = null;
+        let wasEvalRestart = null;
 
         //#region DisplayConfig
         cc = bot.config
@@ -46,8 +47,10 @@ module.exports = {
         s = `support: ${s}`;
         ss = JSON.stringify(cc.settings).split("{\"").join("{\n\ \ \ \ \"").split(",\"").join(",\n\ \ \ \ \"").split("}").join("\n\ \ }");;
         ss = `settings: ${ss}`;
+        sss = JSON.stringify(cc.system).split("{\"").join("{\n\ \ \ \ \"").split(",\"").join(",\n\ \ \ \ \"").split("}").join("\n\ \ }");
+        sss = `settings: ${sss}`;
         //#endregion
-        c = `{\n\ \ ${o}\n\ \ ${s}\n\ \ ${ss}\n}`;
+        c = `{\n\ \ ${o}\n\ \ ${s}\n\ \ ${ss}\n\ \ ${sss}\n}`;
 
         //#endregion
 
@@ -56,21 +59,53 @@ module.exports = {
         bot.guilds.cache.forEach(guild => { usercount = usercount+guild.memberCount });
         //#endregion
 
-        //#region Configuration Formating.
-        conf = [
-            `Took ${readyTimer}.ms\ \ |`,
-            `Database took: ${bot.startUp.DataBase_Retrieval}\ \ |`,
-            `Loaded ${bot.settings.g.size} guild settings for ${bot.guilds.cache.size} guilds.\ \ |`,
-            `Loaded ${bot.settings.u.size} user settings for ${usercount} users.\ \ |`
+        //#region Configuration Formating. //"conf"
+        conf = [];
+
+        if(bot.config.system.exitCode != 0){
+            //#region modify the console-ready
+            conf.push(`Client exited with a non-zero exit-code.`);
+            conf.push(`bot.system.exitReason[${bot.config.system.exitCode}]: "${bot.system.exitReason[bot.config.system.exitCode]}"`);
+            conf.push("|\ \ ----------------------------------------");
+            //#endregion
+            //#region System.ExitCode ConfigModifications
+            if(bot.config.system.exitCode==1){
+                if(bot.config.system.restart.channelID){
+                    wasEvalRestart = true;
+
+                    bot.db.edit("Config", {}, { "system.restart.channelID": null, "system.restart.messageID": null })
+                    .catch(err => bot.print(`Error reseting the system.exitCode: ${err}`));
+                };
+            };
+            //#endregion
+
+            bot.db.edit("Config", {}, {"system.exitCode": 0})
+            .catch(err => bot.print(`Error reseting the system.exitCode: ${err}`));
+        };
+
+        conf2 = [
+            `Took ${readyTimer}.ms`,
+            `Database took: ${bot.startUp.DataBase_Retrieval}`,
+            `Loaded ${bot.settings.g.size} guild settings for ${bot.guilds.cache.size} guilds.`,
+            `Loaded ${bot.settings.u.size} user settings for ${usercount} users.`
         ];
+        conf = conf.concat(conf2);
+
         conf = await bot.functions.get("bufferSpace").execute(conf);
         //#endregion
         bot.print(`Client Configuration:\n${c}`, 1);
-        bot.print(`Client Ready\n>>\ \ \ \ ${conf.join("\n>>\ \ \ \ ")}`);
+        bot.print(`Client Ready\n>>\ \ \ \ ${conf.join("\ \ |\n>>\ \ \ \ ")}\ \ |`);
 
         bot.functions.get("_").init({ bot:bot });
         //SRPG.init();
 
         bot.startUp.Event_Ready = readyTimer+".ms";
+
+        //If the bot was restarted via an eval command, edit the "Restarting...." message to let the author know when the restart completes.
+        // //(I tried to run a time, i kept getting `-` and/or "+" numbers.... i just decided to remove it....)
+        if(wasEvalRestart){
+            bot.channels.cache.get(bot.config.system.restart.channelID).messages.fetch(bot.config.system.restart.messageID)
+            .then(msg => msg.edit(`Restarting....\n• Restarted Successfully.`));
+        }
     },
 };

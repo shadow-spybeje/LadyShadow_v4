@@ -87,7 +87,8 @@ bot.startUp = async function(bot){
             prefix: config.prefix,
             debug: config.debug,
             dmHelp: config.dmHelp
-        }
+        },
+        system: config.system
     };
 
     bot.print("Loaded Configuration Files....",0,0,1)
@@ -110,6 +111,9 @@ bot.startUp = async function(bot){
 
 try{
     bot.startUp(bot);
+    bot.system.exitReason = {
+        ["1"]: "Eval kill"
+    };
 
     const token = require('../../.././tokens.json').Beta;//LadyShadow;
     bot.login(token)

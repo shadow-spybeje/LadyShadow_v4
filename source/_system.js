@@ -14,6 +14,8 @@ module.exports = {
 
     //#endregion
     //#region Settings
+      //System Stuff
+        bot.system = {};
       //Settings Files
         bot.settings = new discord.Collection();
       //server setting files.
@@ -32,13 +34,11 @@ module.exports = {
         bot.functions = new discord.Collection();
 
     //#endregion
-
     //#region Other
 
       bot.phasmo = require("./other/phasmo");
 
     //#endregion
-
         return bot;
     },
 
