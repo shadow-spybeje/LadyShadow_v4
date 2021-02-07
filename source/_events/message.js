@@ -6,6 +6,8 @@ module.exports = {
     usage : "`bot.events.get(\"message\").execute(bot, message)`",
 
     async execute(bot, message){
+        //Lock the bot to "Shadow Communirty" and "Gamer's Fan Server"
+        if(message.guild.id != "416906584900239370" && message.guild.id != "787576597233532928") return;
         if(message.author.bot) return;
 
         //Shadow Community, Gamer's Fan Server
