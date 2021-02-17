@@ -117,7 +117,7 @@ phasmo.evidence = [
         alias: ["freezingtemperatures", "freezingtemps", "temps"]
     },{
         title: "EMF Level 5",
-        alias: ["emflevel5", "em", "5"]
+        alias: ["emflevel5", "emf", "5"]
     }
 ];
 
@@ -140,6 +140,8 @@ phasmo.msg = async function(bot, msg){
 
     if(message == "help")return msg.channel.send(`\`${phasmo.options.prefix}<evedince1>${phasmo.options.msgSpliiter}[evidence2]${phasmo.options.msgSpliiter}[evidence3]\` Search for a ghost with these as evidence.\n\`${phasmo.options.prefix}type${phasmo.options.msgSpliiter}<Ghost type>\` Look up this ghost type.`);
 
+    if(message == "bugs") return msg.channel.send(`**What happened:**\n**What did you expect to happen:**\n**What map was it:**\n**Was it in multiplayer:** Yes\n**VR or non-vr:** Non-VR`, {code:"JS"});
+
     let ghosts = null;
     let evidence = message.toLowerCase()/*.replace(/../gi, "-")*/.split(phasmo.options.msgSpliiter);
     if(!evidence) return;
@@ -148,6 +150,7 @@ phasmo.msg = async function(bot, msg){
         let type = evidence[1];
         let ghost = await phasmo.ghostType(type);
 
+        if(ghost.length == 0) { ghost[0]="-1"; ghost[1] = "No ghost type found with this criteria!"; }
         return phasmo.send(message, msg.channel, ghost);
     };
 
@@ -203,7 +206,8 @@ phasmo.ghostSearch = async function(evidence){
     phasmo.ghosts.forEach(Ghost =>{ //this is ran default.
         Ghost.evidence.forEach(Evidence =>{
             let lowered = Evidence.toLowerCase();
-            if(lowered.includes(evidence[0])) someGhosts1.push(Ghost)
+            if(lowered.includes(evidence[0])){ someGhosts1.push(Ghost) }
+            //else{  };
         });
 
     });

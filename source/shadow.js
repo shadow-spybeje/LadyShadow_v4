@@ -10,6 +10,7 @@
 let readyTimer = Date.now();
 const system = require("./_system");
 const discord = require("discord.js");
+const { msg } = require("./other/phasmo"); //Phasmo Mosule.
 const bot = new discord.Client({ ws: { intents: 515 } });
 bot.readyTimer = readyTimer;
 bot.db = require("../DataBase/main");
