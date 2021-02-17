@@ -48,7 +48,7 @@ module.exports = {
         ss = JSON.stringify(cc.settings).split("{\"").join("{\n\ \ \ \ \"").split(",\"").join(",\n\ \ \ \ \"").split("}").join("\n\ \ }");;
         ss = `settings: ${ss}`;
         sss = JSON.stringify(cc.system).split("{\"").join("{\n\ \ \ \ \"").split(",\"").join(",\n\ \ \ \ \"").split("}").join("\n\ \ }");
-        sss = `settings: ${sss}`;
+        sss = `system: ${sss}`;
         //#endregion
         c = `{\n\ \ ${o}\n\ \ ${s}\n\ \ ${ss}\n\ \ ${sss}\n}`;
 
@@ -62,7 +62,7 @@ module.exports = {
         //#region Configuration Formating. //"conf"
         conf = [];
 
-        if(bot.config.system.exitCode != 0){
+        if(bot.config.system.exitCode == 1){
             //#region modify the console-ready
             conf.push(`Client exited with a non-zero exit-code.`);
             conf.push(`bot.system.exitReason[${bot.config.system.exitCode}]: "${bot.system.exitReason[bot.config.system.exitCode]}"`);
@@ -73,7 +73,7 @@ module.exports = {
                 if(bot.config.system.restart.channelID){
                     wasEvalRestart = true;
 
-                    bot.db.edit("Config", {}, { "system.restart.channelID": null, "system.restart.messageID": null })
+                    bot.db.edit("Config", {}, { "system.restart.channelID": 0, "system.restart.messageID": 0 })
                     .catch(err => bot.print(`Error reseting the system.exitCode: ${err}`));
                 };
             };
@@ -87,7 +87,8 @@ module.exports = {
             `Took ${readyTimer}.ms`,
             `Database took: ${bot.startUp.DataBase_Retrieval}`,
             `Loaded ${bot.settings.g.size} guild settings for ${bot.guilds.cache.size} guilds.`,
-            `Loaded ${bot.settings.u.size} user settings for ${usercount} users.`
+            `Loaded ${bot.settings.u.size} user settings for ${usercount} users.`,
+            `Loaded ${bot.cmds.general.size + bot.cmds.owner.size} commands.`
         ];
         conf = conf.concat(conf2);
 
