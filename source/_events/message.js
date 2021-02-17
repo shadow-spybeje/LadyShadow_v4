@@ -6,23 +6,21 @@ module.exports = {
     usage : "`bot.events.get(\"message\").execute(bot, message)`",
 
     async execute(bot, message){
+
         //Lock the bot to "Shadow Communirty" and "Gamer's Fan Server"
-        if(message.guild.id != "416906584900239370" && message.guild.id != "787576597233532928") return;
+        if(message.channel.type == "text" && message.guild.id != "416906584900239370" && message.guild.id != "787576597233532928") return;
         if(message.author.bot) return;
 
-        //Shadow Community, Gamer's Fan Server
-        if(message.guild.id == "416906584900239370" || message.guild.id == "787576597233532928" && message.content.startsWith(bot.phasmo.options.prefix)){
-            bot.phasmo.msg(bot, {channel:message.channel, msg:message.content});
+        // Phasmo module.
+        if(message.content.startsWith(bot.phasmo.options.prefix)){
+            return bot.phasmo.msg(bot, {channel:message.channel, msg:message.content});
         };
 
         const args = message.content.slice(bot.config.settings.prefix.length).trim().split(/ +/g);
-        const cmd = args.shift();
 
-        if(cmd=="eval"){
-            if(message.author.id != "213250789823610880") return;
+        //Command handler.
 
-            this.eval(message, args);
-        }
+        bot.functions.get('cmds').execute(message, args);
     },
 
 
