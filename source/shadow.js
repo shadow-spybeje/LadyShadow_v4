@@ -30,7 +30,8 @@ var trimer = async function(array){
  * @param {string} error Error to display (Good for stack traces)
  */
 bot.print = function(msg, debugOnly, error, preReady){
-    let post = "";
+    let post = ""; let spmCh, isFound = false;;
+
 
     if(debugOnly){
         if(!bot.config.settings.debug) return;
@@ -40,14 +41,17 @@ bot.print = function(msg, debugOnly, error, preReady){
     };
 
     if(!preReady) spmCh = bot.channels.cache.get("806398879787909131");
+    if(!preReady && spmCh) isFound = true;
+
+    if(!preReady && !isFound) console.log(`\n(!) (!) (!) Dedicated discord console notFound!! (!) (!) (!)`);
 
     if(error){
         post = `>  [${bot.functions.get("date").execute(Date.now())}] -> \n---> Error -> `;
         console.error(post, msg);
-        if(!preReady) spmCh.send(`\`\`\`js\n${post} ${msg}\`\`\``);
+        if(!preReady && isFound) spmCh.send(`\`\`\`js\n${post} ${msg}\`\`\``);
     }else{
         console.log(post);
-        if(!preReady) spmCh.send(`\`\`\`js\n${post}\`\`\``);
+        if(!preReady && isFound) spmCh.send(`\`\`\`js\n${post}\`\`\``);
     };
 };
 
