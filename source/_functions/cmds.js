@@ -9,10 +9,10 @@ module.exports = {
 
     execute(message, args){
         const bot = message.client;
-        const prefix = bot.config.prefix;
+        const prefix = bot.config.settings.prefix;
+		let isOwner; // used only if general can't find anything.
 
         const cmdName = args.shift().toLowerCase();
-        if(bot.config.suspended && cmdName != "eval") return;
 
         //Check our general commands for {cmdName}
         let cmd = bot.cmds.general.get(cmdName) || bot.cmds.general.find(c => c.aliases && c.aliases.includes(cmdName));
@@ -22,7 +22,13 @@ module.exports = {
         //If the user is an owner, check the Owner Commands.
 
         if(!cmd){
-			  if(!bot.config.owners.includes(message.author.id)) return;
+			//if(!bot.config.owners.forEach(owner => { if(owner.id == message.author.id) return true })) return;
+
+			bot.config.owners.forEach(owner => {
+				if(owner.id == message.author.id) isOwner = true;
+			});
+
+			if(!isOwner) return;
 
           	cmd = bot.cmds.owner.get(cmdName) || bot.cmds.owner.find(c => c.aliases && c.aliases.includes(cmdName));
         };
@@ -35,17 +41,7 @@ module.exports = {
         e.setTitle(`${cmdName} Flag`)
         e.setColor("ff0000")
 
-
-          //Owner?
-          if(cmd.owner){
-
-            if(!bot.config.owners.includes(message.author.id)){
-              e.setDescription("**Developer Only**\n• This is a Developer Only `(config.perms[0])` command.");
-              return message.channel.send(e);
-            };
-          };
-
-            //guildOnly
+        //guildOnly
           if (cmd.guildOnly && message.channel.type !== 'text'){
               e.setDescription("**Guild Only**\n• This Command can only be used Server-Side.")
               return message.channel.send(e);
