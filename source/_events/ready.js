@@ -93,9 +93,13 @@ module.exports = {
         conf = conf.concat(conf2);
 
         conf = await bot.functions.get("bufferSpace").execute(conf);
+
+        let dateLength = new Date().getDate().toString().length;
+        let spaces = "";
+        for (i = 0; i < dateLength; i++) { spaces = spaces+"\ " };
         //#endregion
         bot.print(`Client Configuration:\n${c}`, 1);
-        bot.print(`Client Ready\n>>\ \ \ \ ${conf.join("\ \ |\n>>\ \ \ \ ")}\ \ |`);
+        bot.print(`Client Ready\n>>\ \ \ ${spaces}${conf.join(`\ \ |\n>>\ \ \ ${spaces}`)}\ \ |`);
 
         bot.functions.get("_").init({ bot:bot });
         //SRPG.init();
