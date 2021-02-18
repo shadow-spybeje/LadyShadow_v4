@@ -107,7 +107,6 @@ module.exports = {
         bot.startUp.Event_Ready = readyTimer+".ms";
 
         //If the bot was restarted via an eval command, edit the "Restarting...." message to let the author know when the restart completes.
-        // //(I tried to run a time, i kept getting `-` and/or "+" numbers.... i just decided to remove it....)
         if(wasEvalRestart){
             bot.channels.cache.get(bot.config.system.restart.channelID).messages.fetch(bot.config.system.restart.messageID)
             .then(msg => msg.edit(`Restarting....\n• Restarted Successfully.`));

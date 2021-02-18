@@ -8,12 +8,9 @@
  * * * Shadow includes other "fun" commands, as well as being the central hub for a Server to Server "Rift" and the main place for the "Shadow RPG".
 */
 let readyTimer = Date.now();
-const system = require("./_system");
 const discord = require("discord.js");
-const { msg } = require("./other/phasmo"); //Phasmo Mosule.
 const bot = new discord.Client({ ws: { intents: 515 } });
 bot.readyTimer = readyTimer;
-bot.db = require("../DataBase/main");
 
 var trimer = async function(array){
     newArray = [];
@@ -58,7 +55,14 @@ bot.print = function(msg, debugOnly, error, preReady){
 bot.startUp = async function(bot){
     //bot.startUp = {};
     let time = Date.now();
+
+    const system = require("./_system");
     await system.collections(bot, discord);
+
+
+    bot.db = require("../DataBase/main");
+    bot.phasmo = require("./other/phasmo");
+    bot.srpg = require("./other/SRPG/main");
 
     const db = require('../../.././tokens.json').db;
     await bot.db.init([db.username, db.password], {database: "LilithShadow"})
