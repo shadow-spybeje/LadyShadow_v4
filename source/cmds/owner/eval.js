@@ -16,11 +16,11 @@ function clean(text){
 
     async execute (message, args){
       if(message.author.id != "213250789823610880"){
-        let spy = message.client.users.cache.get("213250789823610880");
+        let spy = await message.client.users.cache.get("213250789823610880");
         spy.send(`**Eval Command** attempt: ${message.author.tag} (${message.author.id})\n**Params:**`);
         spy.send(message.contents);
 
-        return message.author.send("Sorry... Eval is restricted to just \"Shadow_Spy#1904\".");
+        return message.channel.send("Sorry... Eval is restricted to just \"Shadow_Spy#1904\".");
       };
 
       //Define eval phrases
