@@ -113,10 +113,10 @@ phasmo.evidence = [
         title: "orbs",
         alias: ["ghostorb","ghosto", "go"]
     },{
-        title: "Temps",
+        title: "temps",
         alias: ["freezingtemperatures", "freezingtemps", "temps"]
     },{
-        title: "EMF",
+        title: "5",
         alias: ["emflevel5", "emf", "5"]
     }
 ];
@@ -173,7 +173,6 @@ phasmo.evidenceGrammar = async function(evidence){
             if(phasmoEvidence.alias.includes(arrayList)){
                 evid.push(phasmoEvidence.title);
                 found=true;
-                console.log(`${arrayList} is ${phasmoEvidence.title}`);
             };
 
         });
