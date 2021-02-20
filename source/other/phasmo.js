@@ -101,22 +101,22 @@ phasmo.evidence = [
     },
     */
     {
-        title: "Fingerprints",
+        title: "prints",
         alias: ["fingers", "prints"]
     },{
-        title: "Spirit Box",
+        title: "box",
         alias: ["spiritbox", "box"]
     },{
-        title: "Ghost Writing",
+        title: "writing",
         alias: ["ghostwriting", "ghostw", "gw", "writing"]
     },{
-        title: "Ghost Orb",
+        title: "orbs",
         alias: ["ghostorb","ghosto", "go"]
     },{
-        title: "Freezing Temperatures",
+        title: "Temps",
         alias: ["freezingtemperatures", "freezingtemps", "temps"]
     },{
-        title: "EMF Level 5",
+        title: "EMF",
         alias: ["emflevel5", "emf", "5"]
     }
 ];
@@ -154,28 +154,35 @@ phasmo.msg = async function(bot, msg){
         return phasmo.send(message, msg.channel, ghost);
     };
 
-    //evidence = this.evidenceGrammar(evidence); // ????
+    evidence = await this.evidenceGrammar(evidence); // ????
     ghosts = await this.ghostSearch(evidence);
     if(ghosts.length == 0) { ghosts[0]="-1"; ghosts[1] = "No ghost type found with this criteria!"; }
     phasmo.send(message, msg.channel, ghosts);
 };
 
 
-/*phasmo.evidenceGrammar = async function(evidence){
+phasmo.evidenceGrammar = async function(evidence){
+
     let evid = [];
-    evidence.forEach(_evidence => {
+    evidence.forEach(arrayList => {
         let found = false;
-        phasmo.evidence.forEach(__evidence => {
-            __evidence.alias.forEach(alias => {
-                if(alias.includes(_evidence)) return evid.push(__evidence.title); found=true;
-            });
+
+        phasmo.evidence.forEach(phasmoEvidence => {
+
+            if(found) return;
+            if(phasmoEvidence.alias.includes(arrayList)){
+                evid.push(phasmoEvidence.title);
+                found=true;
+                console.log(`${arrayList} is ${phasmoEvidence.title}`);
+            };
+
         });
-        if(!found) evid.push(_evidence);// We're trying for the default.
+        if(!found) evid.push(arrayList); // We're trying for the default.
     });
 
     if(!evid) evid = evidence; //we didn't find any matches..... we'll try it....
     return evid;
-};*/
+};
 
 
 phasmo.ghostType = async function(type){
