@@ -8,7 +8,7 @@ module.exports = {
     async execute(bot, message){
 
         //Lock the bot to "Shadow Communirty" and "Gamer's Fan Server"
-        if(message.channel.type == "text" && message.guild.id != "416906584900239370" && message.guild.id != "787576597233532928") return;
+        //if(message.channel.type == "text" && message.guild.id != "416906584900239370" && message.guild.id != "787576597233532928") return;
         if(message.author.bot) return;
 
         // Phasmo module.
@@ -16,6 +16,7 @@ module.exports = {
             return bot.phasmo.msg(bot, {channel:message.channel, msg:message.content});
         };
 
+        if(!message.content.startsWith(bot.config.settings.prefix)) return;
         const args = message.content.slice(bot.config.settings.prefix.length).trim().split(/ +/g);
 
         //Command handler.
