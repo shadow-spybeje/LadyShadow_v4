@@ -64,6 +64,9 @@ module.exports = {
         };
 
         try {
+            bot.config.stats.cmdCount = bot.config.stats.cmdCount +1;
+            if(!bot.config.stats.uniqueUsers.includes(message.author.id)) bot.config.stats.uniqueUsers.push(message.author.id);
+
             cmd.execute(message, args);
         } catch (error) {
 

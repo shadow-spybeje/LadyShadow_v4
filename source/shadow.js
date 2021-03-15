@@ -97,7 +97,12 @@ bot.startUp = async function(bot){
             debug: config.debug,
             dmHelp: config.dmHelp
         },
-        system: config.system
+        system: config.system,
+
+        stats: {
+            cmdCount: 0,
+            uniqueUsers: []
+        }
     };
 
     bot.print("Loaded Configuration Files....",0,0,1)
@@ -135,11 +140,13 @@ try{
 bot.on('ready', () => { bot.events.get('ready').execute(bot); });
 
 
-  //Message Stuff.
+//Message Stuff.
 bot.on('message', (message) => {
 	if(message.partial){
         message.fetch().then(msg => { message=msg }).catch(err => { return console.log(err) })
     };
 	bot.events.get('message').execute(bot, message);
 });
-//#endregion
+
+
+
