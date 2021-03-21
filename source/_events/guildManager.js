@@ -1,5 +1,6 @@
 const { GuildAuditLogs } = require("discord.js");
 const { send } = require("../other/phasmo");
+const { bot } = require("../_functions/_functions");
 
 module.exports = {
     coded : "2021-03-21",
@@ -119,6 +120,14 @@ module.exports = {
         };
 
         // ToDo: notifySupport once done.
+
+        if(!guild.owner){
+            await guild.members.fetch(guild.ownerID) // Fetches owner
+            .then(guildMember => owner = guildMember);
+            guild.owner = owner;
+        };
+
+        await this.bot.guilds.fetch(guild.id);
 
         let e = new discord.MessageEmbed();
         e.setColor("GREEN");
