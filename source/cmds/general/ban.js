@@ -15,14 +15,26 @@ module.exports = {
       //ModLog setting
         type = "Ban";
 
+        let returnMessage = ["You cannot ban this user for the following reasons:"];
+        let memberCanBan = message.member.hasPermission("BAN_MEMBERS");
+        let shadowCanBan = message.guild.me.hasPermission("BAN_MEMBERS");
 
-        if(!message.member.permissions.has("BAN_MEMBERS")) return message.reply("You require `BAN_MEMBERS` permission to do that.");
+        if(!memberCanBan || !shadowCanBan){
 
-        if(!message.guild.members.cache.get(message.client.user.id).permissions.has("BAN_MEMBERS")) return message.reply("I require the `BAN_MEMBERS` permission to Ban somebody!!\nYou can by right-clicking (tap+hold) the user in question and selecting `Ban Member`");
+          if(!memberCanBan) returnMessage.push("• You do not have the required permissions to ban users!\n•• At least one of your roles MUST have the \"Ban Members\" permission set to `true`!!");
+          if(!shadowCanBan) returnMessage.push("• I do not have the required permissions to ban users!\n•• At least one of my roles or my bot role: [shadowRoleHere] need to have the \"Ban Members\" permission set to `true`!!");
+
+
+
+        };
 
         let member = await bot.functions.get("_").getUserFromMention(args[0]);
 
         if(!member) return message.reply(`Please mention a user to ban.\n\`${bot.config.prefix}ban <@user> [reason]\``);
+        //if(!message.guild.members.has(member)) return ,essage.reply("The mentioned user isn't on this server.")
+
+        //ToDo: Check if the mentioned user's highest role is equal or greater than Shadow's highest role.
+        //ToDo: Check if the mentioned user is the server owner.
 
         let reason = args.slice(1).join(' ');
         reason = `Banned by "${message.author.tag}" for "${reason}"`
