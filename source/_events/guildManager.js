@@ -27,15 +27,20 @@ module.exports = {
             this.oldGuild(guild);
         }else if(type == 1){ // New/Created Guild.
             this.newGuild(guild);
+        }else if(type == 2){
+            //Add support settings.
+            /*
+            {
+                listening: bool,
+                serverStates: string,
+                logging: string,
+            }
+            */
         }else{ // This shouldn't happen.
             return;
         };
     },
 
-
-    async notifySupport(bot, msg){
-
-    },
 
     async dbAdd(guild){
 
@@ -67,17 +72,13 @@ module.exports = {
             r=res;
         }).catch(e => { this.bot.print(e, 0, 1); });
 
+        await this.DB.get("Guilds", {id:guild.id}).then(res =>{
+            if(!res[0]) return;
+
+            this.bot.settings.g.set(guild.id, res[0]);
+        }).catch(e => { this.bot.print(e, 0, 1); });
+
         return r;
-    },
-
-
-    async dbRemove(guild){
-        let result = null;
-        await this.DB.edit("Guilds", {id: guild.id}, {status: 0})
-        .then(r => { result = r; })
-        .catch(e => { bot.print(e,0,1); });
-
-        if(result) return result;
     },
 
 
@@ -119,7 +120,6 @@ module.exports = {
             this.bot.print(`GuildManager.newGuild [status.result] error!!\n${status}`,0,1);
         };
 
-        // ToDo: notifySupport once done.
 
         if(!guild.owner){
             await guild.members.fetch(guild.ownerID) // Fetches owner
@@ -127,7 +127,8 @@ module.exports = {
             guild.owner = owner;
         };
 
-        await this.bot.guilds.fetch(guild.id);
+        let g = await this.bot.guilds.fetch(guild.id);
+        if(g) guild = g;
 
         let e = new discord.MessageEmbed();
         e.setColor("GREEN");
@@ -163,53 +164,78 @@ module.exports = {
 
 
     async oldGuild(guild){
-        // check if guild exists in DB.
-        // if exists edit status = 0
-        // else create new entry, then modify status = 0
 
-        //if(!server){ //if it doesn't exist, create it.
-        //    this.dbAdd(guild).then(r => {
-        //        if(r.ok) this.dbRemove(guilds);
-        //    });
-        //}else{
-        //    this.dbRemove(guild);
-        //};
+        let exists;
+        let dbAdd;
+        let status;
 
-        // notifySupport once done.
+        await this.DB.get("Guilds", {id:guild.id}).then(res => {
+            if(!res[0]) return;
+            exists = true;
+        }).catch(e => { this.bot.print(e, 0, 1); });
+
+        if(!exists){
+            dbAdd = await this.dbAdd(guild);
+            if(!dbAdd) this.bot.print(`An error occured created a new guildSettings for an old guild.\nID: \`${guild.id}`,0,1,0,7);
+        };
+
+        await this.DB.edit("Guilds", {id:guild.id}, {status:0}).then(res =>{
+            status=res;
+        }).catch(e => { this.bot.print(e, 0, 1); });
+
+
+        if(status.result.nModified && status.result.ok){
+            //Guild First Join.
+            type = 1;
+        }else{
+            //ERR -- did NOT return [status.result.ok] !!
+            type = 0;
+            this.bot.print(`GuildManager.oldGuild [status.result] error!!\n${status}`,0,1);
+        };
+
+        if(!guild.owner){
+            guild._owner = {};
+            guild._owner.user = await this.bot.users.fetch(guild.ownerID)
+        };
+
+        let e = new discord.MessageEmbed();
+        e.setColor("RED");
+        e.setTimestamp();
+        e.setAuthor(guild.name);
+        e.setThumbnail(guild.iconURL("jpeg",true));
+        if(guild._owner){
+            e.setFooter(`${guild._owner.user.tag} (${guild.ownerID})`, guild._owner.user.avatarURL("jpeg", true));
+        }else{
+            e.setFooter(`${guild.owner.user.tag} (${guild.owner.id})`, guild.owner.user.avatarURL("jpeg", true));
+        };
+
+        let notice = "";
+
+        if(type == 0){
+            this.bot.print(`GuildManager > ERROR`)
+            return this.send(`<@${this.bot.config.owners[0]}>\nGuildManager.newGuild error!!\nID: ${guild.id}`);
+        }else if(type == 1){
+            notice = "Old Guild!";
+            e.setTitle(notice);
+        };
+
+
+        let msg = [
+            `Created On: ${guild.createdAt}`,
+            `Joined At: ${guild.me.joinedAt}`,
+            `Region: ${guild.region}`,
+            `Prefered Locale: ${guild.preferredLocale}`,
+            `Members: ${guild.memberCount}`
+        ];
+        e.setDescription(msg.join("\n"));
+
+        this.bot.print(`GuildManager > ${notice}`)
+        this.send(e);
     },
 
     async send(msg){
         this.bot.print("GuildManager > Executing Send.")
 
         this.bot.functions.get("support").send("serverStatus", msg);
-
-
-        /*this.bot.config.supportServers.forEach(async (server) => {
-            if(server != "416906584900239370") return;
-
-            let guild = await this.bot.settings.g.get(server);
-            if(guild){ //We have the guild in our settings.
-                //Now, let's make sure it has support settings!!
-                if(guild.settings.support){ //We have support settings, let's see if they are listening.
-                    if(guild.settings.support.listening){
-                        this.bot.print(`GuildManager.send.supportServers > support+1`)
-                        guild.settings.support.serverStatus.send(msg);
-                    }else{
-                        this.bot.print(`GuildManager.send.supportServers > support-1`)
-                        this.bot.print(`${server} is not listening to support messages!!`)
-                    };
-                }else{
-                    //Support settings are not found!!
-                    this.bot.print(`${server.id} is a support guild, but they do not have support settings!!`,0, 0, 0, 7);
-
-                    //ToDo: Create support settings!!
-                };
-            }else{
-                this.bot.print(`GuildManager.send.supportServers > !hasGuild`);
-
-                //toDo: check if availble (guild.avail)
-                //toDo: if(true) create settings;
-            }
-        });*/
     },
 };
