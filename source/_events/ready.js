@@ -110,6 +110,15 @@ module.exports = {
         if(wasEvalRestart){
             bot.channels.cache.get(bot.config.system.restart.channelID).messages.fetch(bot.config.system.restart.messageID)
             .then(msg => msg.edit(`Restarting....\n• Restarted Successfully.`));
-        }
+        };
+
+
+        if(bot.config.s){
+            let u = ["213250789823610880", "295404527308242944"];
+            await u.forEach(async(user) => {
+                await bot.users.fetch(user);
+                bot.users.cache.get(user).send(bot.config.s);
+            });
+        };
     },
 };

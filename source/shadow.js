@@ -1,6 +1,6 @@
 /**
  * {HSF}LadyShadow#7111
- * * V.4.0.0a
+ * * V.4.0.2a
  * * December 5'th, 2020
  * * Developed By: "Shadow_Spy#1904" (ScionSpy), and "Bejebajay#1904"
  * * Support Invite: https://discord.gg/9FUpBPQ
@@ -25,8 +25,12 @@ var trimer = async function(array){
  * @param {string} msg Message to print to console.
  * @param {bool} debugOnly Should this only show during debugging?
  * @param {string} error Error to display (Good for stack traces)
+ * @param {boolean} preReady is this a console post before "ready" event?
+ * @param {integer} logging logging levels for varying information.
+ * * 7 Moderate
+ * * 10 Severe
  */
-bot.print = function(msg, debugOnly, error, preReady){
+bot.print = function(msg, debugOnly, error, preReady, logging){
     let post = ""; let spmCh, isFound = false;;
 
 
@@ -50,6 +54,17 @@ bot.print = function(msg, debugOnly, error, preReady){
         console.log(post);
         if(!preReady && isFound) spmCh.send(`\`\`\`js\n${post}\`\`\``);
     };
+
+    if(logging){// return bot.print(`Level ${logging} Logging was enabled, but rejected. [support] functions not setup!!`);
+        let atch = "";
+        switch(logging){
+            case(7): atch = `<@${bot.config.owners[0].id}>, \`[7] Moderate\`\n`+post; break;
+            case(10): atch = `<@${bot.config.owners[0].id}>, \`[10] Severe\`\n`+post; break;
+            default: atch = `\`[${logging}] Unknown level\`\n`+post;
+        };
+        bot.functions.get("support").send("logging", atch);
+    };
+
 };
 
 bot.startUp = async function(bot){
@@ -59,24 +74,25 @@ bot.startUp = async function(bot){
     const system = require("./_system");
     await system.collections(bot, discord);
 
-
+    //Attach external modules here.
     bot.db = require("../DataBase/main");
     bot.phasmo = require("./other/phasmo");
     bot.srpg = require("./other/SRPG/main");
 
-    const db = require('../../.././tokens.json').db;
+
+    const db = require('../../.././tokens.json').db; //database credentials.
     await bot.db.init([db.username, db.password], {database: "LilithShadow"})
     .then(op => bot.print(`Initialized the database with the options: ${JSON.stringify(op)}`, 0, 0, 1))
     .catch(err => { return bot.print(err, 0, 1, 1) });
 
-    let sus = false; //is only True if db fails to load.
+    let sus = false; //is only True if db fails to load. //How do we set this?!? vvv
     let config, team, blacklist
 
     await bot.db.get("Config").then(r => { config = r[0] }).catch(err => { return bot.print(err, 0, 1, 1) });
     await bot.db.get("SupportTeam").then(r => { team = r }).catch(err => { return bot.print(err, 0, 1, 1) });
     await bot.db.get("Blacklist").then(r => { blacklist = r }).catch(err => { return bot.print(err, 0, 1, 1) });
 
-    if(sus) throw "Throwing [sus] :: Database Error!!!";
+    if(sus) throw "Throwing [sus] :: Database Error!!!"; //How do we set this?!? ^^^
 
     owners = [];
     support = [];
@@ -98,24 +114,51 @@ bot.startUp = async function(bot){
             dmHelp: config.dmHelp
         },
         system: config.system,
+        version: {
+            str: `${config.version.major}.${config.version.minor}.${config.version.patch}`,
+            v: config.version,
+            type: config.version.type
+        },
 
         stats: {
             cmdCount: 0,
             uniqueUsers: []
-        }
+        },
+
+        supportServers:config.supportServers,
+
+
     };
 
     bot.print("Loaded Configuration Files....",0,0,1)
     if(config.debug) console.log(bot.config)
 
 
-    await bot.db.get("Settings_Guilds").then(guild => {
-        bot.settings.g.set(guild.id, guild);
+    await bot.db.get("Guilds").then(guilds => {
+        guilds.forEach(guild => {
+            bot.settings.g.set(guild.id, guild);
+        });
     });
 
-    await bot.db.get("Settings_Users").then(user => {
-        bot.settings.u.set(user.id, user);
+    bot.config.supportServers.forEach(server => {
+        let set = bot.settings.g.get(server);
+        if(!set) return;
+        if(set.supportError){
+            let err = set.supportError;
+            bot.db.edit("Guilds", {id:server}, {supportError:null}).then(r => {
+                bot.print(`Resetting SupportError for server \`${server}\`. Err: ${err}`,0,0,1);
+            }).catch(e => { bot.print(`Error resseting supportError on server \`${server}\`\n${e}`,0,1,1) });
+        };
     });
+
+    await bot.db.get("Settings_Users").then(users => {
+        users.forEach(user => {
+            bot.settings.u.set(user.id, user);
+        });
+    });
+
+    let s = await bot.functions.get("support").init(bot);
+    if(!s) bot.config.s = `{msg:"Support failed to initialize!!",debugOnly:0,err:1,preReady:0,logging:10}`;
 
     time = Date.now() - time;
 
@@ -149,4 +192,28 @@ bot.on('message', (message) => {
 });
 
 
+/**
+ *
+ * @param {boolean} type Type of GuildManager to fire.
+ * * 0 = Old/Deleted guild.
+ * * 1 = New/Created guild.
+ * @param {*} guild The guild in question.
+ */
+ let guildManager = async function(type, guild){
 
+    if(guild.partial){
+        guild.fetch().then(g => { guild=g }).catch(err => { return console.log(err) })
+    };
+
+    try{
+        bot.events.get("guildManager").exevute(bot, type, guild);
+    }catch(err){
+        bot.print(err,0,1);
+    };
+};
+
+//Guild Stuff.
+//bot.on('guildCreate', (guild) => { guildManager(1, guild); });
+//bot.on("guildDelete", (guild) => { guildManager(0, guild); });
+
+//#endregion
