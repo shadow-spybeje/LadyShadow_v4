@@ -7,6 +7,7 @@ module.exports = {
     bot: null,
     DB: null,
     supprtServers: null,
+    unsupportedServers: [],
 
     async init(bot){//initializer method.
         if(!bot) return false;
@@ -41,13 +42,14 @@ module.exports = {
 
         let channels = [];
         await this.supportServers.forEach(async (server) =>{
-            let set = this.bot.settings.g.get(server);
-            if(!set) return set={id:server, status:-1, settings:{}}; //No server settings found;
-            set = set.settings;
-            if(set.supportError) return;
+            if(this.unsupportedServers.includes(server)) return; //if unsupported STOP NOW
 
-            if(set.support){
-                set = set.support;
+            let set = this.bot.settings.g.get(server);
+            if(!set) return this.unsupportedServers.unshift(server); //No server settings found;
+            //set = set.settings;
+
+            if(set.settings.support && !set.supportError){
+                set = set.settings.support;
                 if(set.listening){
                     if(set[ch]){
                         channels.push(set[ch]);
@@ -67,10 +69,17 @@ module.exports = {
     },
 
     async supportError(reason, serverID, logging){
-        this.bot.print(`${reason}!!\nID:${serverID}`,0,1,0,logging);
+        this.unsupportedServers.push(serverID);
 
-        this.DB.edit("Guilds", {id:serverID}, {supportError:reason}).then(r => {
-            console.log(r.result);
+        await this.DB.edit("Guilds", {id:serverID}, {supportError:reason}).then(async (r) => {
+            await this.DB.get("Guilds", {id:serverID}).then(async (r) =>{
+                if(![0]) return; //
+                await this.bot.settings.g.set(serverID, r[0]);
+                this.bot.print(`${reason}!!\nID:${serverID}`,0,1,0,logging);
+            }).catch(e => this.bot.print(e,0,1));
         }).catch(e => this.bot.print(e,0,1));
+
+
+        //this.bot.print(`${reason}!!\nID:${serverID}`,0,1,0,logging);
     },
 };
