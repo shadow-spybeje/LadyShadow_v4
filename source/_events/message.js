@@ -45,8 +45,6 @@ module.exports = {
           var prefix = bot.prefix;
           var config = bot.config;
 
-          var prefix = bot.prefix
-
           k = async function(){
               let kill = false;
               let restartMsgID = null;
