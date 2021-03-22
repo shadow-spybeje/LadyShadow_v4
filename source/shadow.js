@@ -27,6 +27,8 @@ var trimer = async function(array){
  * @param {string} error Error to display (Good for stack traces)
  * @param {boolean} preReady is this a console post before "ready" event?
  * @param {integer} logging logging levels for varying information.
+ * * 2 Info
+ * * 5 Notice
  * * 7 Moderate
  * * 10 Severe
  */
@@ -58,6 +60,8 @@ bot.print = function(msg, debugOnly, error, preReady, logging){
     if(logging){// return bot.print(`Level ${logging} Logging was enabled, but rejected. [support] functions not setup!!`);
         let atch = "";
         switch(logging){
+            case(2): atch = `\`[2] Info\``+post; break;
+            case(5): atch = `\`[5] Notice\``+post; break;
             case(7): atch = `<@${bot.config.owners[0].id}>, \`[7] Moderate\`\n`+post; break;
             case(10): atch = `<@${bot.config.owners[0].id}>, \`[10] Severe\`\n`+post; break;
             default: atch = `\`[${logging}] Unknown level\`\n`+post;
@@ -134,7 +138,7 @@ bot.startUp = async function(bot){
     if(config.debug) console.log(bot.config)
 
 
-    await bot.db.get("Guilds").then(guilds => {
+    await bot.db.get("Guilds", {}, {_id:0}).then(guilds => {
         guilds.forEach(guild => {
             bot.settings.g.set(guild.id, guild);
         });
