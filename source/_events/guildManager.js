@@ -36,12 +36,64 @@ module.exports = {
                 logging: string,
             }
             */
+           this.newSupportGuild(guild);
         }else{ // This shouldn't happen.
             return;
         };
     },
 
+    /**
+     * @param {object} guild discord guild object
+     * @returns integer
+     * * 0 = error
+     * * 1 = created settings
+     * * 2 = has settings
+     */
+    async hasDbEntry(guild){
+        let server = false; // this will be our "results", if this remains null, create new guild setting.
 
+        //Check if this guild has a DB entry.
+        await this.DB.get("Guilds", {id:guild.id}).then( results => {
+            server = results[0]; //settings found.
+        }).catch(e => { this.bot.print(e,0,1); });
+
+
+        let status; //status will be true or false. if false, the guild was either not created, or an error occured in editing the status.
+
+        if(!server){ //server=null, create a new DB entry.
+            status = await this.dbAdd(guild);
+        }else{ //server!=null, edit status = 1.
+            await this.DB.edit("Guilds", {id:guild.id}, {status: 1}).then(r => {
+                status = r;
+            }).catch(e => { this.bot.print(e,0,1)});
+        };
+
+        /**
+         * 0 = error
+         * 1 = firstJoin
+         * 2 = rejoin
+         */
+        let type;
+        if(status.result.nModified && status.result.ok){
+            //Has Settings
+            type = 2;
+        }else if(!status.result.nModified && status.result.ok){
+            //Created Settings
+            type = 1;
+        }else{
+            //ERR -- did NOT return [status.result.ok] !!
+            type = 0;
+            this.bot.print(`GuildManager.newGuild [status.result] error!!\n${status}`,0,1);
+        };
+
+        return type;
+    },
+
+    /**
+     * Creates a database entry in the "Guilds" database for thie guild.
+     * @param {object} guild discord guild object
+     * @returns object
+     */
     async dbAdd(guild){
 
         let guildDatabaseEntry = {
@@ -55,10 +107,14 @@ module.exports = {
                 },
 
                 channels: {
-                    welcome: "",
                     greet: "",
                     farewell: "",
+                    rift: "",
+                    modlog: "",
+                    chatlog: "",
+                    userlog: "",
                 },
+
                 roles: {
                     staff: "",
                     mute: "",
@@ -82,43 +138,33 @@ module.exports = {
     },
 
 
+    async newSupportGuild(guild){
+        let type = await this.hasDbEntry(guild);
+
+        if(type == 0) return this.bot.print("Failed to create DB Guild settings....",0,1,0,7);
+
+        let support = {
+            listening: false,
+            serverStats: "",
+            logging: ""
+        };
+
+        let set = this.bot.settings.g.get(guild.id);
+        set.settings.support = support;
+
+        let r;
+        await this.DB.edit("Guilds", {id:guild.id}, set).then(res => r=res)
+        .catch(e => { this.bot.print(e, 0, 1); });
+
+        if(r.result.nModified) this.bot.settings.g.set(guild.id, set);
+
+        this.bot.print(`Added support settings to ID: ${guild.id}`,0,0,0,2);
+    },
+
+
     async newGuild(guild){
 
-        let server = false; // this will be our "results", if this remains null, create new guild setting.
-
-        //Check if this guild has a DB entry.
-        await this.DB.get("Guilds", {id:guild.id}).then( results => {
-            server = results[0]; //settings found.
-        }).catch(e => { this.bot.print(e,0,1); });
-
-
-        let status; //status will be true or false. if false, the guild was either not created, or an error occured in editing the status.
-
-        if(!server){ //server=null, create a new DB entry.
-            status = await this.dbAdd(guild);
-        }else{ //server!=null, edit status = 1.
-            await this.DB.edit("Guilds", {id:guild.id}, {status: 1}).then(r => {
-                status = r;
-            }).catch(e => { this.bot.print(e,0,1)});
-        };
-
-        /**
-         * 0 = error.
-         * 1 = firstJoin.
-         * 2 = rejoin.
-         */
-        let type;
-        if(status.result.nModified && status.result.ok){
-            //Guild Rejoin.
-            type = 2;
-        }else if(!status.result.nModified && status.result.ok){
-            //Guild First Join.
-            type = 1;
-        }else{
-            //ERR -- did NOT return [status.result.ok] !!
-            type = 0;
-            this.bot.print(`GuildManager.newGuild [status.result] error!!\n${status}`,0,1);
-        };
+        let type = await this.hasDbEntry(guild);
 
 
         if(!guild.owner){
@@ -234,8 +280,6 @@ module.exports = {
     },
 
     async send(msg){
-        this.bot.print("GuildManager > Executing Send.")
-
         this.bot.functions.get("support").send("serverStatus", msg);
     },
 };
