@@ -187,7 +187,7 @@ module.exports = {
 
         if(type == 0){
             this.bot.print(`GuildManager > ERROR`)
-            return this.send(`<@${bot.config.owners[0]}>\nGuildManager.newGuild error!!\nID: ${guild.id}`);
+            return this.send(`<@${bot.config.support.team.roles.owner[0]}>\nGuildManager.newGuild error!!\nID: ${guild.id}`);
         }else if(type == 1){
             notice = "New Guild!";
             e.setTitle(notice);
@@ -259,7 +259,7 @@ module.exports = {
 
         if(type == 0){
             this.bot.print(`GuildManager > ERROR`)
-            return this.send(`<@${this.bot.config.owners[0]}>\nGuildManager.newGuild error!!\nID: ${guild.id}`);
+            return this.send(`<@${this.bot.config.support.team.roles.owner[0]}>\nGuildManager.newGuild error!!\nID: ${guild.id}`);
         }else if(type == 1){
             notice = "Old Guild!";
             e.setTitle(notice);

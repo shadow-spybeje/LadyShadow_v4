@@ -22,9 +22,9 @@ module.exports = {
         //If the user is an owner, check the Owner Commands.
 
         if(!cmd){
-			//if(!bot.config.owners.forEach(owner => { if(owner.id == message.author.id) return true })) return;
+			//if(!bot.config.support.team.roles.owner.forEach(owner => { if(owner.id == message.author.id) return true })) return;
 
-			bot.config.owners.forEach(owner => {
+			bot.config.support.team.roles.owner.forEach(owner => {
 				if(owner.id == message.author.id) isOwner = true;
 			});
 

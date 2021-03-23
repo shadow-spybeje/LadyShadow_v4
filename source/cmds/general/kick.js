@@ -31,7 +31,7 @@ module.exports = {
       .catch(err => {
         message.channel.send(`There was an error trying to kick ${member.tag}!`);
         /*let ch = bot.channels.cache.get("416906777049825292")
-        ch.send(`<@${bot.config.owners[0]}> -> Error Executing \`kick\` on ${message.guild.name} (${message.guild.id})`)
+        ch.send(`<@${bot.config.support.team.roles.owner[0]}> -> Error Executing \`kick\` on ${message.guild.name} (${message.guild.id})`)
         .then(ch.send(err));*/
         bot.print(err, 0, 1);
       })

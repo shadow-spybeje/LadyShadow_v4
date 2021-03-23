@@ -9,7 +9,8 @@
 */
 let readyTimer = Date.now();
 const discord = require("discord.js");
-const bot = new discord.Client({ ws: { intents: 515 } });
+const support = require("./_functions/support");
+const bot = new discord.Client({ ws: { intents: 14087 } });
 bot.readyTimer = readyTimer;
 
 var trimer = async function(array){
@@ -60,12 +61,12 @@ bot.print = function(msg, debugOnly, error, preReady, logging){
     if(logging){// return bot.print(`Level ${logging} Logging was enabled, but rejected. [support] functions not setup!!`);
         let atch = "";
         switch(logging){
-            case(2): atch = `\`[2] Info\``+post; break;
-            case(5): atch = `\`[5] Notice\``+post; break;
-            case(7): atch = `<@${bot.config.owners[0].id}>, \`[7] Moderate\`\n`+post; break;
-            case(10): atch = `<@${bot.config.owners[0].id}>, \`[10] Severe\`\n`+post; break;
-            default: atch = `\`[${logging}] Unknown level\`\n`+post;
-        };
+            case(2): atch = `\`[2] Info\``; break;
+            case(5): atch = `\`[5] Notice\``; break;
+            case(7): atch = `<@${bot.config.support.team.roles.owner[0].id}>, \`[7] Moderate\`\n`; break;
+            case(10): atch = `<@${bot.config.support.team.roles.owner[0].id}>, \`[10] Severe\`\n`; break;
+            default: atch = `\`[${logging}] Unknown level\`\n`;
+        }; atch = atch+post;
         bot.functions.get("support").send("logging", atch);
     };
 
@@ -98,20 +99,33 @@ bot.startUp = async function(bot){
 
     if(sus) throw "Throwing [sus] :: Database Error!!!"; //How do we set this?!? ^^^
 
-    owners = [];
-    support = [];
+    let teamRoles = {};
+    let teamMembers = [0];
 
     await team.forEach(member => {
-        if(member._roles.includes("Owner")) owners.push({id:member.id, tag:member._tag});
-        if(member._roles.includes("Support")) support.push({id:member.id, tag:member._tag});
+        member._roles.forEach(role => {
+            role = role.toLowerCase();
+            if(!teamRoles[role]) teamRoles[role] = [0];
+            teamRoles[role].push({id:member.id, tag:member._tag});
+            teamRoles[role][0] = teamRoles[role][0] +1;
+        });
+
+        teamMembers[0] = teamMembers[0] +1;
+        teamMembers.push({id:member.id, tag: member._tag});
     });
 
     bot.blacklist = await trimer(blacklist);
 
 
     bot.config = {
-        owners: owners,
-        support: support,
+        support: {
+            servers: config.supportServers,
+            team:{
+                members: teamMembers,
+                roles: teamRoles
+            },
+        },
+        
         settings:{
             prefix: config.prefix,
             debug: config.debug,
@@ -129,9 +143,6 @@ bot.startUp = async function(bot){
             uniqueUsers: []
         },
 
-        supportServers:config.supportServers,
-
-
     };
 
     bot.print("Loaded Configuration Files....",0,0,1)
@@ -144,7 +155,7 @@ bot.startUp = async function(bot){
         });
     });
 
-    bot.config.supportServers.forEach(server => {
+    bot.config.support.servers.forEach(server => {
         let set = bot.settings.g.get(server);
         if(!set) return;
         if(set.supportError){
@@ -172,6 +183,7 @@ bot.startUp = async function(bot){
 
 try{
     bot.startUp(bot);
+
     bot.system.exitReason = {
         ["1"]: "Eval kill"
     };

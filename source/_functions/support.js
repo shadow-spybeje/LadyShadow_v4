@@ -1,12 +1,10 @@
-const { init } = require("../other/SRPG/main");
-
 module.exports = {
     name: "support",
     description: "",
 
     bot: null,
     DB: null,
-    supprtServers: null,
+    supportServers: null,
     unsupportedServers: [],
 
     async init(bot){//initializer method.
@@ -14,7 +12,7 @@ module.exports = {
 
         this.bot = bot;
         this.DB = bot.db;
-        this.supportServers = bot.config.supportServers;
+        this.supportServers = bot.config.support.servers;
 
         return true;
     },
@@ -45,7 +43,7 @@ module.exports = {
             if(this.unsupportedServers.includes(server)) return; //if unsupported STOP NOW
 
             let set = this.bot.settings.g.get(server);
-            if(!set) return this.unsupportedServers.unshift(server); //No server settings found;
+            if(!set) return this.unsupportedServers.push(server); //No server settings found;
             //set = set.settings;
 
             if(set.settings.support && !set.supportError){
@@ -68,6 +66,12 @@ module.exports = {
         this._send(channels, msg);
     },
 
+    /**
+     * Throws a support setting for the provided guild.
+     * @param {string} reason Reason for the support error.
+     * @param {string} serverID ID of the support server that has the error.
+     * @param {int} logging Logging Level.
+     */
     async supportError(reason, serverID, logging){
         this.unsupportedServers.push(serverID);
 
