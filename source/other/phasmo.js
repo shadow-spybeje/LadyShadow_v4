@@ -1,14 +1,35 @@
 const phasmo = {};
 
+//#region phasmo.options description
+  // They're options dumbass!! What else do you need to know?!?!
+  //#endregion
 phasmo.options = {
+    //Developer thing.
     debug: false,
+
+    // This module's interactor.
     prefix: ",,",
+
+    // How to split your words/evedince. (Probably should leave this alone...)
     msgSpliiter: " ",
-    server: "",//if we choose to lock it to a server.
+
+    // If we choose to lock it to a single server.
+    server: "",
+
+    // Lock this module to ONLY these userid's.
+    // (If any are provided, ONLY they can use the module.) **
     whitelist: [],
-    blacklist: []
+
+    // Blacklist these userid's from this module. **
+    blacklist: [],
+
+    // ** If a user is BOTH whitelisted AND blacklisted, they still cannot use the module.
+    // // If they are the ONLY user whitelisted, [NO ONE] can use the module!!
 };
 
+/**
+ * Our built-in ghost database!
+ */
 phasmo.ghosts = [
         /*{
             type: "",
@@ -92,7 +113,9 @@ phasmo.ghosts = [
     }
 ];
 
-
+/**
+ * checks for misstpyes -- usefull with the new Grammar module.
+ */
 phasmo.evidence = [
     /*
     {
@@ -134,6 +157,13 @@ phasmo.msg = async function(bot, msg){
     if(!message.startsWith(phasmo.options.prefix)){
         return;
     }else{
+        if(phasmo.options.whitelist.length > 0){
+            if(!phasmo.options.whitelist.includes(msg.userid)) return;
+        };
+        if(phasmo.options.blacklist.length > 0){
+            if(phasmo.options.blacklist.includes(msg.userid)) return;
+        };
+
         message = message.slice(phasmo.options.prefix.length).trim().split(/ +/g).join(" "); //"ph. ";
         if(!message) return;
     };
@@ -160,7 +190,12 @@ phasmo.msg = async function(bot, msg){
     phasmo.send(message, msg.channel, ghosts);
 };
 
-
+/**
+ * Check spelling, is there any SH (Short hand) ??
+ * * * * PROTOTYPE
+ * @param {*} evidence
+ * @returns
+ */
 phasmo.evidenceGrammar = async function(evidence){
 
     let evid = [];
@@ -183,7 +218,11 @@ phasmo.evidenceGrammar = async function(evidence){
     return evid;
 };
 
-
+/**
+ * The player wnats to know about a specific type of ghost... Let's share!!
+ * @param {*} type
+ * @returns
+ */
 phasmo.ghostType = async function(type){
     let thisGhost = [];
     phasmo.ghosts.forEach(Ghost => {
@@ -195,7 +234,11 @@ phasmo.ghostType = async function(type){
     return thisGhost;
 };
 
-
+/**
+ * Search our built-in database to see if any of the evedince provided matches any of our ghosts.
+ * @param {*} evidence
+ * @returns
+ */
 phasmo.ghostSearch = async function(evidence){
     let ev = evidence; let _ev = [];
     ev.forEach(e => {
@@ -253,7 +296,12 @@ phasmo.ghostSearch = async function(evidence){
     return someGhosts;
 };
 
-
+/**
+ * Retunr a list of possible ghosts to the channel.
+ * @param {*} query
+ * @param {*} channel
+ * @param {*} ghosts
+ */
 phasmo.send = function(query, channel, ghosts){
     let TheGhosts = [];
 
