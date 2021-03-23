@@ -5,13 +5,13 @@ module.exports = {
 
     async execute(array){
 
-        bufferNumber = 0;
-        array.forEach(item => {
+        let bufferNumber = 0;
+        await array.forEach(item => {
             if(item.length > bufferNumber) bufferNumber = item.length;
         });
 
         let returnArray = [];
-        array.forEach(item => {
+        await array.forEach(item => {
             let bufferedItem = item.padStart(bufferNumber);
             returnArray.push(bufferedItem);
         });

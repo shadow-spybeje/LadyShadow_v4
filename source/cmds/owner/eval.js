@@ -42,11 +42,12 @@ function clean(text){
             .then(msg => {
                 restartMsgID=msg.id;
             })
-            .catch(err => bot.print(`Message Send error. (Eval Cmd "K")`,0,1));
-            await bot.db.edit("Config", {}, {"system.exitCode": 1, "system.restartMessage.channelID": message.channel.id, "system.restart.messageID": restartMsgID})
-            .then(kill=true)
+            .catch(err => bot.print(`Message Send error (No permissions). (Eval Cmd "K")`,0,1,0,2));
+
+            await bot.db.edit("Config", {}, {"system.exitCode": 1, "system.restart.channelID": message.channel.id, "system.restart.messageID": restartMsgID})
+            .then(kill=2)
             .catch(err => kill=err);
-            if(kill!=true){ bot.print(`Error Saving DataBase "Eval(k)" information.`,0,1) }else{ process.exit() };
+            if(kill!=2){ bot.print(`Error Saving DataBase "Eval(k)" information.`,0,1,0,2); console.log(kill); }else{ process.exit() };
         };
 
       //----------
