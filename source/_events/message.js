@@ -13,7 +13,7 @@ module.exports = {
 
         // Phasmo module.
         if(message.content.startsWith(bot.phasmo.options.prefix)){
-            return bot.phasmo.msg(bot, {channel:message.channel, msg:message.content});
+            return bot.phasmo.msg(bot, {channel:message.channel, msg:message.content, userid:message.author.id});
         };
 
         if(!message.content.startsWith(bot.config.settings.prefix)) return;
