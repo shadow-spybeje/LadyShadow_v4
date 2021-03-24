@@ -19,8 +19,15 @@ module.exports = {
         if(!message.content.startsWith(bot.config.settings.prefix)) return;
         const args = message.content.slice(bot.config.settings.prefix.length).trim().split(/ +/g);
 
-        //Command handler.
 
+        //We only want to save people who "use" our bot in the User Database.
+        // This may be changed to above this if we want a blargbot "names" feature.
+
+        if(!bot.settings.u.get(message.author.id)){ //this user isn't saved or cached!!
+            await bot.events.get("userManager").execute(bot, 1,message.author);
+        };
+
+        //Command handler.
         bot.functions.get('cmds').execute(message, args);
     },
 
