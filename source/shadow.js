@@ -63,8 +63,8 @@ bot.print = function(msg, debugOnly, error, preReady, logging){
         switch(logging){
             case(2): atch = `\`[2] Info\``; break;
             case(5): atch = `\`[5] Notice\``; break;
-            case(7): atch = `<@${bot.config.support.team.roles.owner[0].id}>, \`[7] Moderate\`\n`; break;
-            case(10): atch = `<@${bot.config.support.team.roles.owner[0].id}>, \`[10] Severe\`\n`; break;
+            case(7): atch = `<@${bot.config.support.team.roles.owner[1].id}>, \`[7] Moderate\`\n`; break;
+            case(10): atch = `<@${bot.config.support.team.roles.owner[1].id}>, \`[10] Severe\`\n`; break;
             default: atch = `\`[${logging}] Unknown level\`\n`;
         }; atch = atch+post;
         bot.functions.get("support").send("logging", atch);
@@ -125,9 +125,10 @@ bot.startUp = async function(bot){
                 roles: teamRoles
             },
         },
-        
+
         settings:{
             prefix: config.prefix,
+            color: config.color,
             debug: config.debug,
             dmHelp: config.dmHelp
         },
@@ -155,6 +156,7 @@ bot.startUp = async function(bot){
         });
     });
 
+    // Reset any support errors, they may have been resolved with this restart!
     bot.config.support.servers.forEach(server => {
         let set = bot.settings.g.get(server);
         if(!set) return;
@@ -166,7 +168,7 @@ bot.startUp = async function(bot){
         };
     });
 
-    await bot.db.get("Settings_Users").then(users => {
+    await bot.db.get("Users").then(users => {
         users.forEach(user => {
             bot.settings.u.set(user.id, user);
         });

@@ -1,14 +1,10 @@
-const { GuildAuditLogs } = require("discord.js");
-const { send } = require("../other/phasmo");
-const { bot } = require("../_functions/_functions");
-
 module.exports = {
     coded : "2021-03-21",
 
     name : "guildManager",
     description : "This is the \"Guild Manager\" event handler",
 
-    evalArgs : "bot, 0/1, guild",
+    evalArgs : "bot, 0|1|2, guild",
     usage : `\`bot.events.get("${this.name}").execute(${this.evalArgs})\``,
 
     bot: null,
@@ -83,7 +79,7 @@ module.exports = {
         }else{
             //ERR -- did NOT return [status.result.ok] !!
             type = 0;
-            this.bot.print(`GuildManager.newGuild [status.result] error!!\n${status}`,0,1);
+            this.bot.print(`GuildManager.hasDbEntry [status.result] error!!\n${status}`,0,1);
         };
 
         return type;
