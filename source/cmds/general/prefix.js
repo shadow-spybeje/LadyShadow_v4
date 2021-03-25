@@ -18,6 +18,7 @@ module.exports = {
         e.setTitle(msg.title);
         e.setColor(bot.config.settings.color);
         e.setDescription(msg.txt);
+        e.setFooter(`\`${bot.config.settings.prefix}prefix <newPrefix>\` or \`${bot.config.settings.prefix}prefix pprefix <newPprefix>\``);
 
         message.channel.send(e);
     },
