@@ -114,7 +114,7 @@ module.exports = {
             this.bot.print(`UserManager > ERROR`)
             return this.send(`<@${bot.config.support.team.roles.owner[0]}>\nUserManager.newUser error!!\nID: ${user.id}`);
         }else if(type == 1){
-            notice = "New User!";
+            notice = `New User!`;
         };
 
         let msg = [
@@ -131,7 +131,7 @@ module.exports = {
         e.setColor(bot.config.settings.color);
         e.setTimestamp();
 
-        this.bot.print(`UserManager > ${notice}`)
+        this.bot.print(`UserManager > ${notice} -> ${user.tag} (${user.id})`)
         this.send('owner', e);
     },
 
