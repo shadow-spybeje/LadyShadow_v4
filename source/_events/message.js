@@ -11,21 +11,34 @@ module.exports = {
         //if(message.channel.type == "text" && message.guild.id != "416906584900239370" && message.guild.id != "787576597233532928") return;
         if(message.author.bot) return;
 
+		//#region External Modules
+
         // Phasmo module.
         if(message.content.startsWith(bot.phasmo.options.prefix)){
             return bot.phasmo.msg(bot, {channel:message.channel, msg:message.content, userid:message.author.id});
         };
 
-        if(!message.content.startsWith(bot.config.settings.prefix)) return;
-        const args = message.content.slice(bot.config.settings.prefix.length).trim().split(/ +/g);
+		//#endregion
 
+		//#region Prefix Check
+		let prefix = bot.config.settings.prefix;
+		let sPrefix = bot.settings.g.get(message.guild.id).settings.config.prefix;
+		let pPrefix = false; //false, in case we don't have a setting for this user.
+		let args;
 
-        //We only want to save people who "use" our bot in the User Database.
-        // This may be changed to above this if we want a blargbot "names" feature.
+		let uSettings = bot.settings.u.get(message.author.id);
+		if(uSettings) pPrefix = uSettings.settings.config.prefix; //we have a settingsFile. Set pPrefix.
 
-        if(!bot.settings.u.get(message.author.id)){ //this user isn't saved or cached!!
-            await bot.events.get("userManager").execute(bot, 1,message.author);
-        };
+		//Check for a global, server, or personal prefix.
+		if(message.content.startsWith(prefix)){
+			args = message.content.slice(prefix.length).trim().split(/ +/g);
+		}else if(message.content.startsWith(sPrefix)){
+			args = message.content.slice(sPrefix.length).trim().split(/ +/g);
+		}else if(pPrefix && message.content.startsWith(pPrefix)){
+			args = message.content.slice(pPrefix.length).trim().split(/ +/g);
+		}else{ return; };
+
+		//#endregion
 
         //Command handler.
         bot.functions.get('cmds').execute(message, args);
@@ -85,5 +98,5 @@ module.exports = {
         }catch(err){
           message.channel.send(`\`ERROR\` \`\`\`xl\n${clean(err)}\n\`\`\``);
         }
-      }
+    },
 }
