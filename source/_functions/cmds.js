@@ -7,7 +7,7 @@ module.exports = {
     description : "Execute the Command Identifier and cmd if applicable.",
     usage : "bot.functions.get('cmds').execute(message, args);",
 
-    execute(message, args){
+    async execute(message, args){
         const bot = message.client;
         const prefix = bot.config.settings.prefix;
 		let isOwner; // used only if general can't find anything.
@@ -35,6 +35,19 @@ module.exports = {
 
 		//If we STILL don't have a command. Stop. It doesn't exist.
         if(!cmd) return;
+
+
+        // We have a command, now, that we know this user is trying to use the client.
+        // Check if we have a dbEntry. If not, crete one.
+
+        // ToDo: create "awknoledment" posts.
+
+        //We only want to save people who "use" our bot in the User Database.
+        // This may be changed to above this if we want a blargbot "names" feature.
+
+        if(!message.client.settings.u.get(message.author.id)){ //this user isn't saved or cached!!
+            await bot.events.get("userManager").execute(bot, 1,message.author);
+        };
 
 
         let e = new discord.MessageEmbed();
