@@ -6,6 +6,7 @@ let allowedUsers = [
     {id:"295404527308242944", timer:0, exempt: true }, //Beje. Exempt if behaves....
     {id:"784141831604666378", timer:0 }, //Gamer
     {id:"467328820664598540", timer:0}, //Rissaur
+    {id:"386068524667371530", timer:0, exempt:true}, //Kathhh7
 ];
 
 module.exports = {

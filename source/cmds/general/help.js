@@ -1,6 +1,7 @@
 module.exports = {
     coded : "2021-03-14",
     name : "help",
+    aliases: ["segítség", "hjælp", "helfen", "aide"],
     description : "Beta Help.",
     usage : "",
     guildOnly : true,

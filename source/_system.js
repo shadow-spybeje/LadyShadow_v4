@@ -36,7 +36,12 @@ module.exports = {
     //#endregion
     //#region Other
 
-      bot.phasmo = require("./other/phasmo");
+      bot.modules = {};
+      bot.modules.locale = require("./other/localization");
+      bot.modules.phasmo = require("./other/phasmo");
+      bot.modules.sagaspace = require("./other/sagaspace");
+      bot.modules.shadowSass_bots = require("./other/shadowSass_bots");
+      bot.modules.spamMentions = require("./other/spamMentions");
 
     //#endregion
         return bot;

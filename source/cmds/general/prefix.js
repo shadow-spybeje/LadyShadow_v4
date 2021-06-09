@@ -7,49 +7,37 @@ module.exports = {
     help : "general",
 
     bot:  null,
-    guildID: null,
-    userID: null,
 
     async execute (message,args){
         if(!this.bot) this.bot = message.client;
-        this.guildID = message.guild.id;
-        this.userID = message.author.id;
         let msg;
 
-        if(args.length <= 0) msg = await this.checkPrefixes(message); //check prefixes;
-        if(args.length == 1) msg = await this.setServerPrefix(args[0]); //set server prefix;
-        //if(args.length >= 2 && args[0].toLowerCase() == "pprefix") msg = await this.setServerPrefix(args[1]); //set pprefix;
-        //if(args.length >= 2 && args[0].toLowerCase() == "@" && isSupport(message.author.id)) msg = await this.adminSettings({settingType: args[1], id: args[2], newPrefix: args[3]}); //set pprefix;
+        if(args.length <= 0) msg = await this.checkPrefix(message); //check prefixes;
+        if(args.length == 1) msg = await this.setServerPrefix(message.guild.id, message.author.id, args[0]); //set server prefix;
+        if(args.length >= 2 && args[0].toLowerCase() == "@" && this.bot.events.get("userManager").isSupport(message.author.id)){
+            if(!args[2]){ // only "...prefix @ [id]"
+                msg = {title:"Prefix Help - Support", txt:`Please provide a guild.id to modify, then the new prefix.\n\`${this.bot.settings.g.get(message.guild.id).settings.config.prefix}${this.name} @ <guildID> <newPrefix>\`\n• Requires \`Support Level\` overide.`};
+            };
+
+            msg = await this.setServerPrefix(args[1], message.author.id, args[2], true, message.channel);
+        };
 
         e = new discord.MessageEmbed();
-        e.setTitle(msg.title);
+        if(msg.title) e.setTitle(msg.title);
         e.setColor(this.bot.config.settings.color);
         e.setDescription(msg.txt);
-        e.setFooter(`\`${this.bot.config.settings.prefix}prefix <newPrefix>\` or \`${this.bot.config.settings.prefix}prefix pprefix <newPprefix>\``);
+        e.setFooter(`"${this.bot.config.settings.prefix}prefix <newPrefix>" or "${this.bot.config.settings.prefix}pprefix" for personal prefixes.`);
 
         message.channel.send(e);
-
-        this.guildID = null;
     },
 
 
-    async checkPrefixes(message){
-        let prefixes = {
-            global: this.bot.config.settings.prefix,
-            server: this.bot.settings.g.get(message.guild.id).settings.config.prefix,
-            user: this.bot.settings.u.get(message.author.id).settings.config.prefix,
-        };
+    async checkPrefix(message){
+        let thisPrefix = this.bot.settings.g.get(message.guild.id).settings.config.prefix;
 
-        let p = [];
-        if(prefixes.global) p.push(`Global: ${prefixes.global}`);
-        if(prefixes.server) p.push(`Server: ${prefixes.server}`);
-        if(prefixes.user) p.push(`pPrefix: ${prefixes.user}`);
+        let txt = `This server's prefix is: \`${thisPrefix}\``;
 
-        let ps = await this.bot.functions.get("bufferSpace").execute(p);
-
-        let txt = `\`\`\`\n${ps.join("\n")}\`\`\``;
-
-        return {title:"Prefixes", txt: txt};
+        return {title:null, txt: txt};
     },
 
     /**
@@ -57,26 +45,46 @@ module.exports = {
      * @param {string} newPrefix The new server prefix.
      * @returns object {title: string, txt: string}
      */
-    async setServerPrefix(newPrefix){
-        let r; let txt; let errID;
-        let oldPrefix = await this.bot.settings.g.get(this.guildID).settings.config.prefix;
+    async setServerPrefix(guildID, userID, newPrefix, supportAction, channel){
+        let r; let txt; let errID; let superID;
+        let oldPrefix = await this.bot.settings.g.get(guildID).settings.config.prefix;
 
 
-        if(newPrefix === oldPrefix) return {title:"Invalid Prefix!", txt:`\`\`\`css\nYour new prefix [ ${newPrefix} ] is identical to your old prefix!!\`\`\``}
+        if(newPrefix === oldPrefix) return {title:"Invalid Prefix!", txt:`\`\`\`css\nThe new prefix [ ${newPrefix} ] is identical to the old prefix!!\`\`\``}
 
 
-        await this.bot.db.edit("Guilds", {id:this.guildID}, {"settings.config.prefix":newPrefix}).then(res => {
+        if(supportAction) supportActions = await this.supportAction(guildID, userID, newPrefix);
+        /**
+         * this.supportAction returns
+         * supportActions = {
+         *      passed: bool,
+         *      reason: [string], //exists if passed == false;
+         *      actionID: int|string,
+         *      superID: string, //userID
+         * }
+         */
+        if(supportAction && !supportActions.passed){
+            return channel.send(`The supportAction ${supportActions.actionID} was rejected by ${supportActions.superID} for ${supportActions.reason}.`);
+        }else if(supportAction && supportActions.passed){
+            channel.send(`The supportAction ${supportActions.actionID} was approved by ${supportActions.superID}.`);
+        };
+
+        await this.bot.db.edit("Guilds", {id:guildID}, {"settings.config.prefix":newPrefix}).then(res => {
             r=res.result;
         }).catch(e => {
             errID = Date.now();
-            e = `**Prefix Change Error**\n-> Guild ID: ${this.guildID}\nAuthor ID: ${this.userID}\nNew Prefix: ${newPrefix}\n-> Error ID: ${errID}\n\n${e}`;
+            if(!supportAction){
+                e = `**Prefix Change Error**\n-> Guild ID: ${guildID}\nAuthor ID: ${userID}\nNew Prefix: ${newPrefix}\n-> Error ID: ${errID}\n\n${e}`;
+            }else{
+                e = `**Prefix Change Error**\n-> Guild ID: ${guildID}\nSupport.Member.ID: ${userID}\nSupport.Super.id: ${supportActions.superID}\nNew Prefix: ${newPrefix}\n-> Error ID: ${errID}\n\n${e}`;
+            };
 
             this.bot.print(e,0,1,0,7);
-            txt = {title:"Prefix Error!", txt:`There was an error changing your prefix.\\n-> Error ID: ${errID}`};
+            txt = {title:"Prefix Error!", txt:`There was an error changing the prefix!\n-> Error ID: ${errID}`};
         });
 
         if(r.nModified){
-            this.bot.settings.g.get(this.guildID).settings.config.prefix = newPrefix;
+            this.bot.settings.g.get(guildID).settings.config.prefix = newPrefix;
 
             txt =  {title:"New Guild Prefix", txt:`\`\`\`js\nOld Prefix: ${oldPrefix}\nNew Prefix: ${newPrefix}\`\`\``};
         };
@@ -85,32 +93,35 @@ module.exports = {
     },
 
 
-    async setPersonalPrefix(newPrefix){},
-
     /**
      * Allows support members to change the prefix settings of any user/guild provided the proper information.
-     * @param {object} options {settingsType: string, id: integer, newPrefix: string}
-     * * settingsType: user|guild
-     * * id: User|Guild ID
-     * * newPrefix: prefix to set.
-     * @returns object {title: string, txt: string}
+     *
      */
-    async adminSettings(options){},
-
-
     /**
-     * Checks if the acting user is a support member.
-     * This will prevent non-authorized users from accessing the support features "@"
-     * @param {sring} userID Discord UserID.
-     * @returns bool
+     *
+     * @param {string} guildID
+     * @param {string} userID
+     * @param {string} newPrefix
+     * @returns object {
+     *   passed: bool,
+     *   [reason: string],
+     *   actionID: int,
+     *   superID: string
+     * }
+     * * reason is only applicable if `passed == false`
      */
-    async isSupport(userID){
-        let isSupport = false;
+    async supportAction(guildID, userID, newPrefix){
+        let supportActions = {
+            passed: false,
+            reason: null,
+            actionID: null,
+            superID: null,
+        };
 
-        this.bot.config.support.team.roles.support.forEach(member => {
-            if(member.id == message.author.id) isSupport = true;
-        });
+        this.bot.functions.get("_").dbLogging.Create()
 
-        return isSupport;
+
+        return supportActions;
     },
+
 };

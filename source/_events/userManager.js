@@ -10,6 +10,10 @@ module.exports = {
     bot: null,
     DB: null,
 
+    async init(bot){
+        this.bot = bot;
+    },
+
     async execute(bot, type, user){
         let exeErr = [];
         if(!type && type != 0) exeErr.push("Type not specified!");
@@ -81,7 +85,9 @@ module.exports = {
             settings: {
                 config: {
                     prefix: this.bot.config.settings.prefix,
+                    langCode: "en",
                 },
+                todo: { count:0 },
             },
         };
 
@@ -128,11 +134,13 @@ module.exports = {
         e.setAuthor(`${user.tag}, (${user.id})`);
         e.setThumbnail(user.avatarURL("jpeg", true));
         e.setDescription(msg.join("\n"));
-        e.setColor(bot.config.settings.color);
+        e.setColor(this.bot.config.settings.color);
         e.setTimestamp();
 
         this.bot.print(`UserManager > ${notice} -> ${user.tag} (${user.id})`)
         this.send('owner', e);
+
+        return type;
     },
 
     async send(ch, msg){
@@ -145,5 +153,38 @@ module.exports = {
         ch.forEach(c => { try{ this.bot.users.cache.get(c).send(msg); }catch(e){ this.bot.print(e,0,1,0,2); } });
 
         //this.bot.functions.get("supportTeam").send(ch, msg);
+    },
+
+
+    /**
+     * Checks if the acting user is a support member.
+     * This will prevent non-authorized users from accessing the support features "@"
+     * @param {sring} userID Discord UserID.
+     * @returns bool
+     */
+    async isSupport(userID){
+        let isSupport = false;
+
+        this.bot.config.support.team.roles.support.forEach(member => {
+            if(member.id == userID) isSupport = true;
+        });
+
+        return isSupport;
+    },
+
+    /**
+     * Checks if the acting user is a admin member.
+     * This will prevent non-authorized users from accessing the admin features "@"
+     * @param {sring} userID Discord UserID.
+     * @returns bool
+     */
+     async isAdmin(userID){
+        let isAdmin = false;
+
+        this.bot.config.support.team.roles.admin.forEach(member => {
+            if(member.id == userID) isAdmin = true;
+        });
+
+        return isAdmin;
     },
 };

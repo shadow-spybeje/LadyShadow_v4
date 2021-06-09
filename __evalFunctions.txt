@@ -1,0 +1,77 @@
+
+##Add/Remove settings.
+..eval
+bot.settings.g.forEach(guild=> {
+
+  let newGuild = {}
+  newGuild.status = guild.status;
+  newGuild.id = guild.id;
+  newGuild.settings = guild.settings;
+  //newGuild.settings = {}
+  //newGuild.settings.config = guild.settings.config;
+  //newGuild.settings.channels = guild.settings.channels;
+  //newGuild.settings.roles = guild.settings.roles;
+  //newGuild.settings.warnings = guild.settings.warnings
+  //if(guild.settings.support) newGuild.settings.support = guild.settings.support;
+
+  // addNew settings below. // Above will preserve older settings.
+
+
+  bot.db.edit("__Guilds", {id: guild.id}, newGuild);
+});
+
+
+
+bot.settings.u.forEach(user => {
+
+  let newUser = {}
+  newUser.id = user.id;
+  newUser.settings = user.settings;
+  //newUser.settings = {};
+  //newUser.settings.config = user.settings.config;
+  newUser.settings.todo = { count:0 };
+
+  // addNew settings below. // Above will preserve older settings.
+
+
+  bot.db.edit("__Users", {id: user.id}, newUser);
+});
+
+
+
+
+
+
+
+
+
+
+..eval
+let max = 21600000; let min = 14400000;
+async function getTime(min,max){
+  allowed = max-min;
+  let n = bot.functions.get("_").rand(allowed, true);
+  let now = Date.now();
+  return { nTime: n, time: (max-n) /1000/60/60, now: now, nextExe: now+(n)};
+};
+async function fn(){
+  let times = [];
+  for(i=0; i<3;i++){
+    times.push(await getTime(min,max));
+  };
+  let _times =[];
+  times.forEach(time =>{ _times.push(`{n:${time.nTime}, time:${time.time}, now:${time.now}, nextExe:${time.nextExe}}`)});
+  message.channel.send(_times);
+}; fn();
+
+{n:475514, time:5.867912777777778, now:1622698104264, nextExe:1622698579778}
+{n:314126, time:5.912742777777778, now:1622698104264, nextExe:1622698418390}
+{n:1381595, time:5.616223611111111, now:1622698104264, nextExe:1622699485859}
+
+..eval
+times = [
+  1622698104264/1000/60/60,
+  1622698579778/1000/60/60,
+  (1622698104264 +475514)/1000/60/60
+];
+message.channel.send(times.join("\n"));

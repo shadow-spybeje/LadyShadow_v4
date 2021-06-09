@@ -83,6 +83,13 @@ bot.startUp = async function(bot){
     bot.db = require("../DataBase/main");
     bot.phasmo = require("./other/phasmo");
     bot.srpg = require("./other/SRPG/main");
+    bot.sass = {
+        mood: function(newMood){
+            if(isNaN(newMood)) return false;
+            return bot.sass._b.mood = newMood;
+        },
+        _b: bot.modules.shadowSass_bots
+    };
 
 
     const db = require('../../.././tokens.json').db; //database credentials.
@@ -125,6 +132,8 @@ bot.startUp = async function(bot){
                 roles: teamRoles
             },
         },
+
+        blacklist: blacklist,
 
         settings:{
             prefix: config.prefix,

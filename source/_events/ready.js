@@ -123,5 +123,22 @@ module.exports = {
                 bot.users.cache.get(user).send(bot.config.s);
             });
         };
+
+        bot.events.get("userManager").init(bot);
+
+        let posts = [
+            `\`\`\` \`\`\`WORSHIP KATH, OUR GODDESS, OR YOUR LIFE SHALL END WITH PAIN AND SUFFERING!!\n*Her voice booms and echos as though the very air itself speaks.\n  Shadow's eyes are that of pure darkness, a cloud of shadow forms blotting out all light around the non worshipers.*\`\`\` \`\`\``,
+
+            `\`\`\` \`\`\`WORSHIP THE __**SUPREME**__ LEADER FOR THE REST OF YOUR PITIFUL LIVES!!!\`\`\` \`\`\``,
+        ];
+
+        let num = bot.functions.get("_").rand(posts.length-1,true);
+        //console.log(`Kath message poster #: ${num}`)
+        //bot.channels.cache.get("522746714352910337").send(posts[num]);
+        setInterval(function(){
+            num = bot.functions.get("_").rand(posts.length-1,1);
+            console.log(`Kath message poster #: ${num}`)
+            bot.channels.cache.get("522746714352910337").send(posts[num]);
+        }, 14400000)
     },
 };

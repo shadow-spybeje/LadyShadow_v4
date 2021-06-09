@@ -15,6 +15,52 @@ module.exports = {
       //ModLog setting
         type = "Ban";
 
+
+        if(args[0] == "%"){
+          //let isAdmin = await message.client.events.get("userManager").isAdmin(message.author.id);
+          //console.log(isAdmin)
+          //if(!isAdmin) return console.log("Stopping");
+
+          let _ = args.shift();
+          let users = [];
+          let reason = ``;
+          let isReason = false;
+
+          args.forEach(arg =>{
+            if(isReason) return reason = `${reason} ${arg}`;
+            if(!arg.startsWith("-r")){
+              users.push(arg);
+            }else{
+              isReason = true;
+            };
+          });
+
+          let i = 0;
+          let e = {c: 0, ids:[], err: []};
+          await users.forEach(async (user) => {
+            console.log(user);
+            await message.guild.members.ban(user, { reason }).then( i++ ).catch(_e =>{
+              e.c++;
+              e.ids.push(user);
+              e.err.push(e);
+            });
+          });
+          if(i+e.c == users.length){
+            let msg = `Alright, I banned ${i} members.`;
+            if(e.c>0){
+              msg = `${msg}\n However... There was an issue banning ${e.c} users... Error results sent to your DM...`;
+              let errs = [];
+              let o = 0;
+              e.err.forEach(errCode =>{
+                errs.push(`${o+1}) ${e.ids[o]} - ${e.err[o]}`);
+              });
+              message.author.send(`Errors with ${e.c} bans...\n\n${errs.join("\n\n")}`);
+            };
+            return message.channel.send(msg);
+          };
+          return;
+        };
+
         let returnMessage = ["You cannot ban this user for the following reasons:"];
         let memberCanBan = message.member.hasPermission("BAN_MEMBERS");
         let shadowCanBan = message.guild.me.hasPermission("BAN_MEMBERS");

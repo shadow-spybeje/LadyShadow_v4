@@ -47,6 +47,8 @@ module.exports = {
 
         if(!message.client.settings.u.get(message.author.id)){ //this user isn't saved or cached!!
             await bot.events.get("userManager").execute(bot, 1,message.author);
+            message.channel.send(`You've been created :D -- Please re-execute your command for function!`);
+            return message.author.send(`Your data has been saved so we can give you some special features, like languages!!\nFor more information run \`${message.client.config.settings.prefix}help\`, or join our support server at \`discord.gg/9FUpBPQ\``);
         };
 
 
