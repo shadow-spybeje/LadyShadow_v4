@@ -3,12 +3,13 @@ module.exports = {
     name : "functions",
     description : "Logs all of the functions used within the bot.",
 
-    execute(bot){
+    async execute(bot){
       const fs = require("fs");
       const funcFiles = fs.readdirSync('./source/_functions').filter(file => file.endsWith('.js'));
 
       for (const file of funcFiles) { 	const func = require(`.././_functions/${file}`);
         if(file=="_functions.js") bot.functions.set("_", func);
+        if(func.botInit){ await func.botInit(bot); };
         bot.functions.set(func.name, func);
       };
 

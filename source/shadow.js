@@ -76,11 +76,13 @@ bot.startUp = async function(bot){
     //bot.startUp = {};
     let time = Date.now();
 
+    //Attach external modules here.
+    bot.db = require("../DataBase/main");
+
     const system = require("./_system");
     await system.collections(bot, discord);
 
-    //Attach external modules here.
-    bot.db = require("../DataBase/main");
+    bot.util = require("./other/_Utilites");
     bot.phasmo = require("./other/phasmo");
     bot.srpg = require("./other/SRPG/main");
     bot.sass = {
@@ -90,7 +92,6 @@ bot.startUp = async function(bot){
         },
         _b: bot.modules.shadowSass_bots
     };
-
 
     const db = require('../../.././tokens.json').db; //database credentials.
     await bot.db.init([db.username, db.password], {database: "LilithShadow"})
@@ -183,9 +184,6 @@ bot.startUp = async function(bot){
         });
     });
 
-    let s = await bot.functions.get("support").init(bot);
-    if(!s) bot.config.s = `{msg:"Support failed to initialize!!",debugOnly:0,err:1,preReady:0,logging:10}`;
-
     time = Date.now() - time;
 
     bot.print(`Database retrieval finished. (Took ${time}.ms)`, 0, 0, 1);
@@ -226,14 +224,14 @@ bot.on('message', (message) => {
  * * 1 = New/Created guild.
  * @param {*} guild The guild in question.
  */
- let guildManager = async function(type, guild){
+let guildManager = async function(type, guild){
 
     if(guild.partial){
         guild.fetch().then(g => { guild=g }).catch(err => { return console.log(err) })
     };
 
     try{
-        bot.events.get("guildManager").exevute(bot, type, guild);
+        bot.events.get("guildManager").execute(bot, type, guild);
     }catch(err){
         bot.print(err,0,1);
     };

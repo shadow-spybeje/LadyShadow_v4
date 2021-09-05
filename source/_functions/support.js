@@ -7,14 +7,9 @@ module.exports = {
     supportServers: null,
     unsupportedServers: [],
 
-    async init(bot){//initializer method.
-        if(!bot) return false;
-
+    async botInit(bot){//initializer method.
         this.bot = bot;
         this.DB = bot.db;
-        this.supportServers = bot.config.support.servers;
-
-        return true;
     },
 
     /**
@@ -39,7 +34,7 @@ module.exports = {
         //settings.support[ch]
 
         let channels = [];
-        await this.supportServers.forEach(async (server) =>{
+        await this.bot.config.support.servers.forEach(async (server) =>{
             if(this.unsupportedServers.includes(server)) return; //if unsupported STOP NOW
 
             let set = this.bot.settings.g.get(server);

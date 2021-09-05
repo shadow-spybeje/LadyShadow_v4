@@ -42,6 +42,9 @@ module.exports = {
       bot.modules.sagaspace = require("./other/sagaspace");
       bot.modules.shadowSass_bots = require("./other/shadowSass_bots");
       bot.modules.spamMentions = require("./other/spamMentions");
+      bot.modules.altFinder = require('./other/AltFinder/AltFinder.js');
+      bot.modules.tos_roleCards = require('./other/tosRoleCards.js');
+      bot.sectors = require("./vo_sectorid.js");
 
     //#endregion
         return bot;

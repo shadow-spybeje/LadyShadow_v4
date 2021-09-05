@@ -1,5 +1,6 @@
 module.exports = {
     bot: null,
+    name: "_",
 
     /**
      *

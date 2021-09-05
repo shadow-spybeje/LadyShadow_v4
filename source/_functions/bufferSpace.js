@@ -3,7 +3,7 @@ module.exports = {
     description: "Add whitespace buggering to an array of items based on the longest item in the array.\nA good way to make an even middle among items.",
     usage: "bot.functions.get('bufferSpace').execute(array)",
 
-    async execute(array, padStart){
+    async execute(array, padStart, floatLeft){
         let bufferNumber = 0;
         if(padStart) bufferNumber = padStart;
         await array.forEach(item => {
@@ -20,7 +20,12 @@ module.exports = {
         let returnArray = [];
         await array.forEach(item => {
             item = item.toString();
-            let bufferedItem = item.padStart(bufferNumber);
+            let bufferedItem;
+            if(!floatLeft){
+                bufferedItem= item.padStart(bufferNumber);
+            }else{
+                bufferedItem= item.padEnd(bufferNumber);
+            };
             returnArray.push(bufferedItem);
         });
 

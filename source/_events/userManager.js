@@ -1,3 +1,5 @@
+const locale = require("../other/localization");
+
 module.exports = {
     coded : "2021-03-21",
 
@@ -10,8 +12,9 @@ module.exports = {
     bot: null,
     DB: null,
 
-    async init(bot){
+    async botInit(bot){
         this.bot = bot;
+        this.db = bot.db;
     },
 
     async execute(bot, type, user){
@@ -19,9 +22,6 @@ module.exports = {
         if(!type && type != 0) exeErr.push("Type not specified!");
         if(!user) exeErr.push("User not specified!");
         if(exeErr.size > 0) return bot.print("User Manager:\n>> "+exeErr.join("\n>> "),0 ,1);
-
-        this.bot = bot;
-        this.DB = bot.db;
 
         /*if(type == 0){ // Old/Deleted User.
             this.oldUser(user);
@@ -153,38 +153,5 @@ module.exports = {
         ch.forEach(c => { try{ this.bot.users.cache.get(c).send(msg); }catch(e){ this.bot.print(e,0,1,0,2); } });
 
         //this.bot.functions.get("supportTeam").send(ch, msg);
-    },
-
-
-    /**
-     * Checks if the acting user is a support member.
-     * This will prevent non-authorized users from accessing the support features "@"
-     * @param {sring} userID Discord UserID.
-     * @returns bool
-     */
-    async isSupport(userID){
-        let isSupport = false;
-
-        this.bot.config.support.team.roles.support.forEach(member => {
-            if(member.id == userID) isSupport = true;
-        });
-
-        return isSupport;
-    },
-
-    /**
-     * Checks if the acting user is a admin member.
-     * This will prevent non-authorized users from accessing the admin features "@"
-     * @param {sring} userID Discord UserID.
-     * @returns bool
-     */
-     async isAdmin(userID){
-        let isAdmin = false;
-
-        this.bot.config.support.team.roles.admin.forEach(member => {
-            if(member.id == userID) isAdmin = true;
-        });
-
-        return isAdmin;
     },
 };

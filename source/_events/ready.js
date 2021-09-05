@@ -104,7 +104,6 @@ module.exports = {
         bot.print(`Client Configuration:\n${c}`, 1);
         bot.print(`Client Ready\n>>\ \ \ ${spaces}${conf.join(`\ \ |\n>>\ \ \ ${spaces}`)}\ \ |`);
 
-        bot.functions.get("_").init({ bot:bot });
         //SRPG.init();
 
         bot.startUp.Event_Ready = readyTimer+".ms";
@@ -116,29 +115,32 @@ module.exports = {
         };
 
 
-        if(bot.config.s){
-            let u = ["213250789823610880", "295404527308242944"];
-            u.forEach(async(user) => {
-                await bot.users.fetch(user);
-                bot.users.cache.get(user).send(bot.config.s);
-            });
-        };
+        bot.functions.forEach(async (fn) =>{
+            if(fn.botInit){ await fn.botInit(bot) };
+        });
+        bot.events.forEach(async (fn) =>{
+            if(fn.botInit){ await fn.botInit(bot) };
+        });
 
-        bot.events.get("userManager").init(bot);
+        bot.util.init(bot);
 
-        let posts = [
-            `\`\`\` \`\`\`WORSHIP KATH, OUR GODDESS, OR YOUR LIFE SHALL END WITH PAIN AND SUFFERING!!\n*Her voice booms and echos as though the very air itself speaks.\n  Shadow's eyes are that of pure darkness, a cloud of shadow forms blotting out all light around the non worshipers.*\`\`\` \`\`\``,
 
-            `\`\`\` \`\`\`WORSHIP THE __**SUPREME**__ LEADER FOR THE REST OF YOUR PITIFUL LIVES!!!\`\`\` \`\`\``,
-        ];
 
-        let num = bot.functions.get("_").rand(posts.length-1,true);
-        //console.log(`Kath message poster #: ${num}`)
-        //bot.channels.cache.get("522746714352910337").send(posts[num]);
-        setInterval(function(){
-            num = bot.functions.get("_").rand(posts.length-1,1);
+        if(bot.guilds.cache.has("522746713514180608") && bot.guilds.cache.get("522746713514180608").available){
+            let posts = [
+                `\`\`\` \`\`\`WORSHIP KATH, OUR GODDESS, OR YOUR LIFE SHALL END WITH PAIN AND SUFFERING!!\n*Her voice booms and echos as though the very air itself speaks.\n  Shadow's eyes are that of pure darkness, a cloud of shadow forms blotting out all light around the non worshipers.*\`\`\` \`\`\``,
+
+                `\`\`\` \`\`\`WORSHIP THE __**SUPREME**__ LEADER FOR THE REST OF YOUR PITIFUL LIVES!!!\`\`\` \`\`\``,
+            ];
+
+            let num = bot.functions.get("_").rand(posts.length-1,true);
             console.log(`Kath message poster #: ${num}`)
             bot.channels.cache.get("522746714352910337").send(posts[num]);
-        }, 14400000)
+            setInterval(function(){
+                num = bot.functions.get("_").rand(posts.length-1,1);
+                console.log(`Kath message poster #: ${num}`);
+                bot.channels.cache.get("522746714352910337").send(posts[num]);
+            }, 14400000)
+        };
     },
 };
