@@ -129,18 +129,24 @@ phasmo.ghosts = [
         "weakness": "Reacts to salt",
         "tip": ""
     },{
-        type: "Goryo",
-        evidence: ["EMF 5", "Fingerprints", "DOTS Projector"],
-        strength: "Usually shows on camera when alone",
-        weakness: "Rarely wanders far from favorite room",
-        tip: "Aim a camera at the DOTS, Goryos can only be seen through them!"
+        "type": "Goryo",
+        "evidence": ["EMF 5", "Fingerprints", "DOTS Projector"],
+        "strength": "Usually shows on camera when alone",
+        "weakness": "Rarely wanders far from favorite room",
+        "tip": "Aim a camera at the DOTS, Goryos can only be seen through them!"
     },{
-        type: "Myling",
-        evidence: ["EMF 5", "Ghost Writing", "Fingerprints"],
-        strength: "Quieter when hunting",
-        weakness: "Frequently makes paranormal sounds",
-        tip: "Be quiet! They are more sensitive to player noises, and it angers them!!!"
-    },
+        "type": "Myling",
+        "evidence": ["EMF 5", "Ghost Writing", "Fingerprints"],
+        "strength": "Quieter when hunting",
+        "weakness": "Frequently makes paranormal sounds",
+        "tip": "Be quiet! They are more sensitive to player noises, and it angers them!!!"
+    },{
+        "type": "Yokai",
+        "evidence": ["Ghost Orbs", "Spirit Box", "DOTS Projector"],
+        "strength": "Talking near it makes it angrier and more likely to attack",
+        "weakness": "When hunting, it can only hear close to it",
+        "tip": "It appears this ghost can hunt above 50% sanity if you make it angry enough by talking."
+    }
 ];
 
 /**
